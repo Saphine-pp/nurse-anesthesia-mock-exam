@@ -100,8 +100,15 @@
     .calc{background:#f0f0f0;color:#000;border:1px solid #999;}
     .opt.correct{outline:2px solid var(--signal);}
     .q{break-inside:avoid;}
-    .results{display:none;}.submitcard{display:none;}
+    .results{display:none;}.submitcard{display:none;}.namecard{display:none;}
   }
+  /* name entry */
+  .namecard{margin:16px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .namecard label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 8px;}
+  .namecard input{width:100%;font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);}
+  .namecard input:focus{outline:none;border-color:var(--slate);}
+
   /* submit / tracking */
   .submitcard{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;}
   .submitcard h3{margin:0 0 4px;font-size:17px;font-weight:600;}
@@ -143,6 +150,13 @@
   </div>
 </header>
 
+<div class="wrap">
+  <div class="namecard">
+    <label for="takerName">ชื่อ–นามสกุล ของผู้ทำ (ไม่บังคับ)</label>
+    <input id="takerName" type="text" placeholder="กรอกชื่อก่อนเริ่มทำข้อสอบ หากอยากให้ปรากฏใน Dashboard" maxlength="60" autocomplete="name">
+  </div>
+</div>
+
 <div class="scorebar">
   <div class="inner">
     <span class="readout">SCORE <b id="score">0</b>/<span id="answered">0</span> · <span id="total">100</span> ข้อ</span>
@@ -161,15 +175,13 @@
   </div>
 
   <div class="submitcard">
-    <h3>คะแนนจะถูกบันทึกอัตโนมัติ</h3>
-    <p class="sub">เมื่อตอบครบทั้ง 100 ข้อ ระบบจะส่งคะแนนเข้า Dashboard ให้เองโดยไม่ต้องกรอกชื่อ — ใส่ชื่อด้านล่างก่อนทำข้อสอบเสร็จหากอยากให้ปรากฏใน Dashboard</p>
+    <h3>คะแนนบันทึกอัตโนมัติ</h3>
+    <p class="sub">เมื่อตอบครบทั้ง 100 ข้อ ระบบจะส่งคะแนนเข้า Dashboard ให้ทันทีโดยอัตโนมัติ ไม่ต้องกดปุ่มใดๆ</p>
+    <div id="submitStatus" class="submitstatus"></div>
     <div class="namerow">
-      <input id="takerName" type="text" placeholder="ชื่อ–นามสกุล (ไม่บังคับ)" maxlength="60" autocomplete="name">
-      <button id="submitBtn" class="btn" onclick="submitScore()" disabled>ส่งคะแนนอีกครั้ง</button>
       <button class="btn ghost" onclick="copyResult()">คัดลอกผล</button>
     </div>
-    <div id="submitStatus" class="submitstatus"></div>
-    <p class="submitnote">คะแนนจะถูกส่งเองทันทีที่ตอบครบ 100 ข้อ · ปุ่ม “ส่งคะแนนอีกครั้ง” ไว้ใช้กรณีต้องการส่งซ้ำ (เช่น เปลี่ยนชื่อทีหลัง) · ถ้าส่งเข้าระบบไม่ได้ ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้</p>
+    <p class="submitnote">ถ้าส่งเข้าระบบไม่ได้ ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้</p>
   </div>
 </div>
 
@@ -586,8 +598,6 @@ function updateScore(){
   document.getElementById("answered").textContent=answered;
   document.getElementById("fill").style.width=(answered/totalQ*100)+"%";
   renderBreakdown();
-  const btn=document.getElementById("submitBtn");
-  if(btn) btn.disabled = (answered!==totalQ);
   if(answered===totalQ && !autoSubmitted){
     autoSubmitted=true;
     submitScore();
@@ -630,19 +640,21 @@ function setStatus(msg,cls){
   const el=document.getElementById("submitStatus");
   el.textContent=msg; el.className="submitstatus"+(cls?(" "+cls):"");
 }
-function submitScore(){
+function submitScore(retry){
   if(answered!==totalQ){ setStatus("กรุณาตอบให้ครบทั้ง 100 ข้อก่อนส่ง","err"); return; }
   const p=buildPayload();
   if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0){
     setStatus("ยังไม่ได้ตั้งค่าลิงก์ระบบเก็บคะแนน — ใช้ปุ่ม “คัดลอกผล” ส่งให้ผู้จัดสอบแทนได้","err"); return;
   }
-  setStatus("กำลังส่ง…");
-  const btn=document.getElementById("submitBtn"); btn.disabled=true;
+  setStatus("กำลังส่งคะแนน…");
   fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify(p)})
-  .then(()=>{ btn.disabled=false; setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓ ขอบคุณค่ะ","ok"); })
-  .catch(()=>{ btn.disabled=false; setStatus("ส่งไม่สำเร็จ ลองใหม่ หรือใช้ปุ่ม “คัดลอกผล”","err"); });
+  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓ ขอบคุณค่ะ","ok"); })
+  .catch(()=>{
+    if(!retry){ setTimeout(()=>submitScore(true),1500); return; }
+    setStatus("ส่งคะแนนอัตโนมัติไม่สำเร็จ — ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้","err");
+  });
 }
 function copyResult(){
   const txt=resultText();
