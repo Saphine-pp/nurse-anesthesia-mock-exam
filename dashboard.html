@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard คะแนน — Mixed Mock Exam 100 ข้อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF0F2;--panel:#FFFFFF;--ink:#1A2026;--muted:#5C6873;--line:#D7DCE1;
+    --slate:#334A5E;--slate-soft:#E3E9EE;
+    --signal:#1F9D63;--signal-soft:#E4F4EC;--alert:#C4463A;--alert-soft:#F8E7E5;
+    --ink-panel:#141A20;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 18px 80px;}
+
+  header.hero{background:var(--ink-panel);color:#EDF1F4;padding:26px 18px 24px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8FA6B8;margin:0 0 8px;}
+  .hero h1{font-size:24px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .hero p{margin:0;color:#9AA9B6;font-size:13.5px;}
+  .hero a.back{color:#DDE5EB;font-size:12.5px;text-decoration:none;border:1px solid rgba(255,255,255,.22);
+    padding:4px 10px;border-radius:99px;display:inline-block;margin-top:12px;}
+  .hero a.back:hover{border-color:#fff;}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 18px;flex-wrap:wrap;}
+  .toolbar .status{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);}
+  .toolbar .actions{display:flex;gap:8px;align-items:center;}
+  input#search{font-family:"IBM Plex Sans Thai",sans-serif;font-size:13.5px;padding:7px 11px;
+    border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:160px;}
+  input#search:focus{outline:none;border-color:var(--slate);}
+  .btn{font-family:"IBM Plex Sans Thai",sans-serif;font-size:13.5px;font-weight:600;border:none;border-radius:8px;
+    padding:8px 14px;cursor:pointer;background:var(--slate);color:#fff;transition:opacity .15s;}
+  .btn:hover{opacity:.9;}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--muted);}
+  .btn.ghost:hover{border-color:var(--slate);color:var(--slate);}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .card .lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;}
+  .card .val{font-size:22px;font-weight:700;color:var(--ink);}
+  .card .sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px;}
+  .panel h3{margin:0 0 4px;font-size:16px;font-weight:600;}
+  .panel .sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+
+  .trow{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .trow .nm{font-size:13.5px;width:100px;flex:none;font-weight:500;}
+  .trow .tb{flex:1;height:9px;background:var(--line);border-radius:99px;overflow:hidden;}
+  .trow .tb i{display:block;height:100%;width:0;transition:width .5s ease;}
+  .trow .sc{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);width:70px;text-align:right;flex:none;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  tbody tr:hover{background:#FAFBFC;}
+  td.name{font-weight:500;}
+  td.rank{font-family:"IBM Plex Mono",monospace;color:var(--muted);}
+  .pct{font-family:"IBM Plex Mono",monospace;font-weight:600;}
+  .pct.high{color:var(--signal);}
+  .pct.low{color:var(--alert);}
+  .badges{display:flex;gap:4px;flex-wrap:nowrap;}
+  .badge{font-family:"IBM Plex Mono",monospace;font-size:10px;padding:2px 6px;border-radius:5px;color:#fff;white-space:nowrap;}
+  .tablewrap{overflow-x:auto;}
+
+  .empty,.errbox{padding:30px 10px;text-align:center;color:var(--muted);font-size:13.5px;}
+  .errbox{color:var(--alert);}
+  .cfgbox{background:var(--alert-soft);border:1px solid var(--alert);color:#7A2A22;border-radius:10px;
+    padding:14px 16px;font-size:13px;line-height:1.7;margin-bottom:18px;}
+  .cfgbox code{background:#fff;padding:1px 6px;border-radius:5px;font-family:"IBM Plex Mono",monospace;font-size:12px;}
+
+  footer{margin-top:30px;text-align:center;color:var(--muted);font-size:12px;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Board Prep · Score Dashboard</p>
+    <h1>สรุปคะแนนผู้เข้าสอบ</h1>
+    <p>Mixed Mock Exam 100 ข้อ — ข้อมูลดึงตรงจาก Google Sheet ผ่าน Apps Script</p>
+    <a class="back" href="mixed_mock_exam_100_tracked.html">← กลับไปหน้าข้อสอบ</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="cfgWarning"></div>
+
+  <div class="toolbar">
+    <span class="status" id="status">กำลังโหลด…</span>
+    <div class="actions">
+      <input id="search" type="text" placeholder="ค้นหาชื่อ…" oninput="renderTable()">
+      <button class="btn ghost" onclick="load()">รีเฟรช</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><p class="lbl">ผู้เข้าสอบ</p><p class="val" id="cCount">–</p></div>
+    <div class="card"><p class="lbl">คะแนนเฉลี่ย</p><p class="val" id="cAvg">–</p><p class="sub">จาก 100 ข้อ</p></div>
+    <div class="card"><p class="lbl">คะแนนสูงสุด</p><p class="val" id="cMax">–</p></div>
+    <div class="card"><p class="lbl">คะแนนต่ำสุด</p><p class="val" id="cMin">–</p></div>
+  </div>
+
+  <div class="panel">
+    <h3>ความแม่นยำเฉลี่ยรายหัวข้อ</h3>
+    <p class="sub">เฉลี่ยจากผู้เข้าสอบทั้งหมดที่ส่งคะแนนมาแล้ว</p>
+    <div id="topicBreakdown"></div>
+  </div>
+
+  <div class="panel">
+    <h3>รายชื่อผู้เข้าสอบ</h3>
+    <p class="sub">เรียงตามคะแนนรวมจากมากไปน้อย</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>ชื่อ</th><th>คะแนน</th><th>%</th>
+            <th>Vent</th><th>Opioid</th><th>Volatile</th><th>Induction</th><th>NMB</th>
+            <th>เวลาส่ง</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="emptyMsg" style="display:none;">ยังไม่มีข้อมูลผู้เข้าสอบ</div>
+  </div>
+</div>
+
+<footer>Dashboard สรุปคะแนน · ข้อมูลอัปเดตเมื่อกดรีเฟรชหรือโหลดหน้าใหม่</footer>
+
+<script>
+const DATA_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+const TOPICS={
+  vent:{label:"VENT",color:"#0E7C7B",name:"Ventilator circuit"},
+  op:{label:"OPIOID",color:"#6C3FA6",name:"Opioid"},
+  vol:{label:"VOLATILE",color:"#3A4A9E",name:"Volatile"},
+  ind:{label:"INDUCTION",color:"#9E3450",name:"Induction"},
+  nmb:{label:"NMB",color:"#2E6B4E",name:"Muscle relaxant"}
+};
+
+let rows=[];
+
+function parseFrac(s){
+  if(typeof s!=="string"||s.indexOf("/")<0) return {ok:0,n:0};
+  const [ok,n]=s.split("/").map(Number);
+  return {ok:ok||0,n:n||0};
+}
+
+function setStatus(msg){document.getElementById("status").textContent=msg;}
+
+async function load(){
+  if(!DATA_URL || DATA_URL.indexOf("PASTE_")===0){
+    document.getElementById("cfgWarning").innerHTML=
+      '<div class="cfgbox">ยังไม่ได้ตั้งค่าลิงก์ข้อมูล — ใส่ Apps Script Web App URL ในตัวแปร <code>DATA_URL</code> ที่ท้ายไฟล์นี้ก่อน</div>';
+    setStatus("ยังไม่ได้ตั้งค่า");
+    return;
+  }
+  setStatus("กำลังโหลด…");
+  try{
+    const res=await fetch(DATA_URL,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    rows=await res.json();
+    setStatus("อัปเดตล่าสุด "+new Date().toLocaleTimeString("th-TH"));
+    renderAll();
+  }catch(err){
+    setStatus("โหลดข้อมูลไม่สำเร็จ");
+    document.getElementById("tbody").innerHTML="";
+    document.getElementById("emptyMsg").style.display="block";
+    document.getElementById("emptyMsg").textContent="ดึงข้อมูลไม่สำเร็จ: "+err.message;
+  }
+}
+
+function renderAll(){
+  renderCards();
+  renderTopics();
+  renderTable();
+}
+
+function renderCards(){
+  const n=rows.length;
+  document.getElementById("cCount").textContent=n;
+  if(!n){
+    document.getElementById("cAvg").textContent="–";
+    document.getElementById("cMax").textContent="–";
+    document.getElementById("cMin").textContent="–";
+    return;
+  }
+  const scores=rows.map(r=>Number(r.score)||0);
+  const avg=scores.reduce((a,b)=>a+b,0)/n;
+  document.getElementById("cAvg").textContent=avg.toFixed(1);
+  document.getElementById("cMax").textContent=Math.max(...scores);
+  document.getElementById("cMin").textContent=Math.min(...scores);
+}
+
+function renderTopics(){
+  const box=document.getElementById("topicBreakdown");
+  box.innerHTML="";
+  Object.keys(TOPICS).forEach(k=>{
+    let ok=0,n=0;
+    rows.forEach(r=>{const f=parseFrac(r[k]);ok+=f.ok;n+=f.n;});
+    const pct=n?Math.round(ok/n*100):0;
+    const tp=TOPICS[k];
+    const row=document.createElement("div");
+    row.className="trow";
+    row.innerHTML=`<span class="nm">${tp.name}</span>
+      <span class="tb"><i style="width:${pct}%;background:${tp.color}"></i></span>
+      <span class="sc">${pct}% (${ok}/${n||0})</span>`;
+    box.appendChild(row);
+  });
+}
+
+function renderTable(){
+  const q=(document.getElementById("search").value||"").trim().toLowerCase();
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+  const filtered=rows
+    .filter(r=>!q || String(r.name||"").toLowerCase().indexOf(q)>=0)
+    .slice()
+    .sort((a,b)=>(Number(b.score)||0)-(Number(a.score)||0));
+
+  document.getElementById("emptyMsg").style.display = filtered.length ? "none" : "block";
+  if(!filtered.length && rows.length) document.getElementById("emptyMsg").textContent="ไม่พบชื่อที่ค้นหา";
+
+  filtered.forEach((r,i)=>{
+    const total=Number(r.total)||100;
+    const score=Number(r.score)||0;
+    const pct=Math.round(score/total*100);
+    const pctClass= pct>=70?"high":(pct<50?"low":"");
+    const tr=document.createElement("tr");
+    const ts=r.timestamp? new Date(r.timestamp).toLocaleString("th-TH",{dateStyle:"short",timeStyle:"short"}) : "-";
+    tr.innerHTML=`
+      <td class="rank">${i+1}</td>
+      <td class="name">${escapeHtml(r.name||"(ไม่ระบุ)")}</td>
+      <td>${score}/${total}</td>
+      <td class="pct ${pctClass}">${pct}%</td>
+      ${["vent","op","vol","ind","nmb"].map(k=>{
+        const f=parseFrac(r[k]);
+        return `<td><span class="badge" style="background:${TOPICS[k].color}">${f.ok}/${f.n}</span></td>`;
+      }).join("")}
+      <td>${ts}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+load();
+</script>
+</body>
+</html>

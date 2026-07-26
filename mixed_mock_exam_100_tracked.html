@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข้อสอบรวม 100 ข้อ — คละหัวข้อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF0F2;--panel:#FFFFFF;--ink:#1A2026;--muted:#5C6873;--line:#D7DCE1;
+    --slate:#334A5E;--slate-soft:#E3E9EE;
+    --signal:#1F9D63;--signal-soft:#E4F4EC;--alert:#C4463A;--alert-soft:#F8E7E5;
+    --ink-panel:#141A20;
+    --t-vent:#0E7C7B;--t-vent-bg:#E971;
+    --t-op:#6C3FA6;--t-vol:#3A4A9E;--t-ind:#9E3450;--t-nmb:#2E6B4E;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px;}
+
+  header.hero{background:var(--ink-panel);color:#EDF1F4;padding:26px 18px 24px;position:relative;overflow:hidden;}
+  .hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8FA6B8;margin:0 0 8px;}
+  .hero h1{font-size:26px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .hero p{margin:0 0 14px;color:#9AA9B6;font-size:14px;}
+  .legend{display:flex;flex-wrap:wrap;gap:7px;}
+  .lg{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;padding:3px 9px;border-radius:99px;
+    border:1px solid rgba(255,255,255,.22);color:#DDE5EB;}
+  .lg i{display:inline-block;width:7px;height:7px;border-radius:99px;margin-right:6px;vertical-align:middle;}
+  .strip{position:absolute;left:0;right:0;bottom:0;height:4px;display:flex;z-index:2;}
+  .strip span{flex:1;}
+
+  .scorebar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 18px;}
+  .scorebar .inner{max-width:820px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .readout{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);}
+  .readout b{color:var(--slate);font-weight:600;}
+  .bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden;max-width:230px;}
+  .bar span{display:block;height:100%;width:0;background:var(--slate);transition:width .4s ease;}
+  .reset{font-family:"IBM Plex Mono",monospace;font-size:12px;background:none;border:1px solid var(--line);
+    color:var(--muted);padding:5px 10px;border-radius:7px;cursor:pointer;}
+  .reset:hover{border-color:var(--slate);color:var(--slate);}
+
+  .block-head{display:flex;align-items:baseline;gap:12px;margin:38px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  .block-head .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--slate);font-weight:600;}
+  .block-head h2{font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .block-head .rng{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;margin:0 0 14px;}
+  .q-top{display:flex;gap:9px;align-items:flex-start;flex-wrap:wrap;}
+  .qno{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;background:var(--slate-soft);color:var(--slate);
+    padding:3px 8px;border-radius:6px;flex:none;margin-top:2px;}
+  .pill{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;padding:3px 8px;border-radius:6px;
+    flex:none;margin-top:2px;color:#fff;}
+  .stem{font-size:15.5px;font-weight:500;flex-basis:100%;margin-top:2px;}
+  .opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px;}
+  .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+    cursor:pointer;font-size:14.5px;background:#fff;transition:border-color .15s,background .15s;}
+  .opt:hover{border-color:var(--slate);background:#FAFBFC;}
+  .opt .k{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--muted);flex:none;}
+  .opt.correct{background:var(--signal-soft);border-color:var(--signal);}
+  .opt.correct .k{color:var(--signal);}
+  .opt.wrong{background:var(--alert-soft);border-color:var(--alert);}
+  .opt.wrong .k{color:var(--alert);}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:.55;}
+
+  .explain{margin-top:12px;border-left:3px solid var(--slate);background:#F7F9FA;border-radius:0 8px 8px 0;
+    padding:11px 13px;font-size:14px;color:#2A343D;display:none;}
+  .explain.show{display:block;}
+  .explain .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--slate);display:block;margin-bottom:4px;}
+  .explain b{color:var(--ink);}
+  .calc{margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:#141A20;color:#AFC6D6;
+    padding:9px 11px;border-radius:7px;white-space:pre-wrap;line-height:1.5;}
+
+  /* results */
+  .results{margin-top:36px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;}
+  .results h3{margin:0 0 4px;font-size:17px;font-weight:600;}
+  .results .sub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+  .trow{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+  .trow .nm{font-size:13.5px;width:112px;flex:none;font-weight:500;}
+  .trow .tb{flex:1;height:9px;background:var(--line);border-radius:99px;overflow:hidden;}
+  .trow .tb i{display:block;height:100%;width:0;transition:width .5s ease;}
+  .trow .sc{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);width:52px;text-align:right;flex:none;}
+
+  footer{margin-top:36px;text-align:center;color:var(--muted);font-size:12.5px;}
+  footer .mono{font-size:11px;letter-spacing:.1em;}
+
+  @media print{
+    .scorebar,.reset,.strip{display:none!important;}
+    body{background:#fff;}
+    header.hero{background:#fff;color:#000;border-bottom:2px solid #000;}
+    .eyebrow{color:#000;}.hero p{color:#333;}.lg{color:#000;border-color:#999;}
+    .explain{display:block!important;}
+    .calc{background:#f0f0f0;color:#000;border:1px solid #999;}
+    .opt.correct{outline:2px solid var(--signal);}
+    .q{break-inside:avoid;}
+    .results{display:none;}.submitcard{display:none;}
+  }
+  /* submit / tracking */
+  .submitcard{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;}
+  .submitcard h3{margin:0 0 4px;font-size:17px;font-weight:600;}
+  .submitcard .sub{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .namerow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .namerow input{flex:1;min-width:180px;font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);}
+  .namerow input:focus{outline:none;border-color:var(--slate);}
+  .btn{font-family:"IBM Plex Sans Thai",sans-serif;font-size:14.5px;font-weight:600;border:none;border-radius:9px;
+    padding:10px 18px;cursor:pointer;background:var(--slate);color:#fff;transition:opacity .15s;}
+  .btn:hover{opacity:.9;}
+  .btn:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--muted);}
+  .btn.ghost:hover{border-color:var(--slate);color:var(--slate);opacity:1;}
+  .submitstatus{margin-top:12px;font-size:13.5px;min-height:20px;}
+  .submitstatus.ok{color:var(--signal);}
+  .submitstatus.err{color:var(--alert);}
+  .submitnote{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.7;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Board Prep · Mixed Mock Exam</p>
+    <h1>ข้อสอบรวม 100 ข้อ — คละหัวข้อ</h1>
+    <p>Ventilator circuit · Opioid · Volatile · Induction · Muscle relaxant · หัวข้อละ 20 ข้อ สลับกันแบบข้อสอบจริง</p>
+    <div class="legend">
+      <span class="lg"><i style="background:#3FB0AE"></i>VENT</span>
+      <span class="lg"><i style="background:#A87FD8"></i>OPIOID</span>
+      <span class="lg"><i style="background:#7C90DC"></i>VOLATILE</span>
+      <span class="lg"><i style="background:#D0748C"></i>INDUCTION</span>
+      <span class="lg"><i style="background:#5FAF87"></i>NMB</span>
+    </div>
+  </div>
+  <div class="strip">
+    <span style="background:#0E7C7B"></span><span style="background:#6C3FA6"></span>
+    <span style="background:#3A4A9E"></span><span style="background:#9E3450"></span>
+    <span style="background:#2E6B4E"></span>
+  </div>
+</header>
+
+<div class="scorebar">
+  <div class="inner">
+    <span class="readout">SCORE <b id="score">0</b>/<span id="answered">0</span> · <span id="total">100</span> ข้อ</span>
+    <div class="bar"><span id="fill"></span></div>
+    <button class="reset" onclick="resetQuiz()">รีเซ็ต</button>
+  </div>
+</div>
+
+<main class="wrap" id="quiz"></main>
+
+<div class="wrap">
+  <div class="results">
+    <h3>สรุปคะแนนรายหัวข้อ</h3>
+    <p class="sub">อัปเดตอัตโนมัติเมื่อตอบ — ใช้ดูว่าหัวข้อใดยังต้องทบทวนเพิ่ม</p>
+    <div id="breakdown"></div>
+  </div>
+
+  <div class="submitcard">
+    <h3>ส่งคะแนนให้ผู้จัดสอบ</h3>
+    <p class="sub">กรอกชื่อ แล้วกดส่งเมื่อทำครบทุกข้อ — คะแนนจะถูกบันทึกเข้าระบบของผู้จัดสอบ</p>
+    <div class="namerow">
+      <input id="takerName" type="text" placeholder="ชื่อ–นามสกุล ของผู้ทำ" maxlength="60" autocomplete="name">
+      <button id="submitBtn" class="btn" onclick="submitScore()" disabled>ส่งคะแนน</button>
+      <button class="btn ghost" onclick="copyResult()">คัดลอกผล</button>
+    </div>
+    <div id="submitStatus" class="submitstatus"></div>
+    <p class="submitnote">ปุ่ม “ส่งคะแนน” จะเปิดใช้งานเมื่อตอบครบทั้ง 100 ข้อ · ถ้าส่งเข้าระบบไม่ได้ ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้</p>
+  </div>
+</div>
+
+<footer class="wrap">
+  <p>ข้อสอบต้นฉบับ เรียบเรียงแนวจากคลังข้อสอบเก่าในโปรเจกต์ — ใช้เพื่อฝึกทบทวนเท่านั้น</p>
+  <p class="mono">MIXED MOCK EXAM · 100 ITEMS · SCORE-TRACKING v1</p>
+  <p><a href="dashboard.html" style="color:var(--muted)">ดูสรุปคะแนนผู้เข้าสอบทั้งหมด →</a></p>
+</footer>
+
+<script>
+// ==== ตั้งค่าการเก็บคะแนน ====
+// วางลิงก์ Google Apps Script Web App ของคุณตรงนี้ (ดูวิธีทำในข้อความที่แนบมา)
+const SUBMIT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+// =============================
+
+const TOPICS={
+  vent:{label:"VENT",color:"#0E7C7B",name:"Ventilator circuit"},
+  op:{label:"OPIOID",color:"#6C3FA6",name:"Opioid"},
+  vol:{label:"VOLATILE",color:"#3A4A9E",name:"Volatile"},
+  ind:{label:"INDUCTION",color:"#9E3450",name:"Induction"},
+  nmb:{label:"NMB",color:"#2E6B4E",name:"Muscle relaxant"}
+};
+
+const BLOCKS=[
+{title:"ชุดที่ 1",qs:[
+ {t:"vent",stem:"ระบบ Mapleson ชนิดใดมีประสิทธิภาพดีที่สุดในผู้ป่วยที่หายใจเอง",
+  opts:["Mapleson A","Mapleson B","Mapleson C","Mapleson D"],ans:0,
+  exp:"<b>Mapleson A (Magill)</b> ต้องการ fresh gas flow เพียงประมาณ alveolar minute ventilation (~70 ml/kg/min) ในโหมดหายใจเอง เพราะตำแหน่ง APL valve อยู่ใกล้ผู้ป่วย ระบายลมหายใจออกได้ก่อนรอบถัดไป · จำคู่กันว่า <b>A ดีสำหรับ spontaneous, D ดีสำหรับ controlled</b>"},
+ {t:"op",stem:"opioid ชนิดใดที่การกำจัดยาไม่ขึ้นกับการทำงานของตับและไต",
+  opts:["Morphine","Meperidine","Remifentanil","Methadone"],ans:2,
+  exp:"<b>Remifentanil</b> ถูกสลายด้วย nonspecific plasma และ tissue esterase จึงเป็น organ-independent ไม่ต้องปรับขนาดในผู้ป่วยตับหรือไตวาย และมี context-sensitive half-time สั้นคงที่ ~3–5 นาที"},
+ {t:"vol",stem:"ยาดมสลบชนิดใดมีค่า MAC สูงที่สุด",
+  opts:["Isoflurane","Sevoflurane","Desflurane","Nitrous oxide"],ans:3,
+  exp:"ค่า MAC โดยประมาณ: N₂O ~104%, desflurane ~6%, sevoflurane ~2%, isoflurane ~1.2% · <b>MAC แปรผกผันกับความแรงของยา</b> N₂O จึงมี potency ต่ำที่สุดและใช้เดี่ยว ๆ ให้สลบไม่ได้"},
+ {t:"ind",stem:"Propofol ออกฤทธิ์หลักผ่าน receptor ใด",
+  opts:["GABA-A receptor","NMDA receptor","Alpha-2 receptor","Mu receptor"],ans:0,
+  exp:"Propofol เป็น <b>GABA-A agonist</b> เพิ่มการไหลเข้าของ chloride ทำให้เซลล์ประสาท hyperpolarize · ketamine ออกฤทธิ์ที่ NMDA, dexmedetomidine ที่ alpha-2 และ opioid ที่ mu receptor"},
+ {t:"nmb",stem:"Succinylcholine ถูกทำให้หมดฤทธิ์ด้วยกลไกใด",
+  opts:["Acetylcholinesterase ที่ neuromuscular junction","Pseudocholinesterase ในพลาสมา","เอนไซม์ cytochrome P450 ที่ตับ","Hofmann elimination ในกระแสเลือด"],ans:1,
+  exp:"<b>Pseudocholinesterase (plasma cholinesterase)</b> สลายยาตั้งแต่ในกระแสเลือด ยาที่ไปถึง receptor จึงมีน้อยและออกฤทธิ์สั้นเพียง 5–10 นาที · ผู้ที่มีเอนไซม์ผิดปกติจะเกิด prolonged apnea"},
+ {t:"vent",stem:"ส่วนประกอบใดของ circle system ป้องกันการหายใจซ้ำก๊าซคาร์บอนไดออกไซด์เป็นหลัก",
+  opts:["APL valve","Reservoir bag","Unidirectional valves","Fresh gas inlet"],ans:2,
+  exp:"<b>Unidirectional (one-way) valves</b> บังคับทิศทางการไหลของแก๊สให้ไปทางเดียว หากลิ้นค้างหรือปิดไม่สนิทจะเกิด rebreathing ทันทีแม้ absorbent ยังดีอยู่ · ส่วน CO₂ absorber ทำหน้าที่กำจัด CO₂ ในแก๊สที่ไหลวนกลับ"},
+ {t:"op",stem:"ผู้ป่วยไตวายระยะสุดท้ายควรหลีกเลี่ยง opioid ชนิดใดมากที่สุดเนื่องจาก metabolite ที่ออกฤทธิ์",
+  opts:["Fentanyl","Morphine","Remifentanil","Sufentanil"],ans:1,
+  exp:"Morphine ถูกเปลี่ยนเป็น <b>morphine-6-glucuronide (M6G)</b> ซึ่งออกฤทธิ์แรงกว่ายาต้นแบบและถูกขับทางไต เมื่อสะสมในไตวายจะทำให้ซึมและกดการหายใจนาน · fentanyl ให้ norfentanyl ที่ไม่มีฤทธิ์จึงปลอดภัยกว่า"},
+ {t:"vol",stem:"ยาดมสลบชนิดใดมีค่า blood:gas partition coefficient สูงที่สุด",
+  opts:["Desflurane","Sevoflurane","Isoflurane","Halothane"],ans:3,
+  exp:"ค่าโดยประมาณ: desflurane 0.42, N₂O 0.47, sevoflurane 0.65, isoflurane 1.4, <b>halothane 2.4</b> · ยิ่งละลายในเลือดมาก alveolar concentration ยิ่งขึ้นช้า ทำให้นำสลบช้าและฟื้นช้า"},
+ {t:"ind",stem:"ผลข้างเคียงที่พบบ่อยจากการนำสลบด้วย etomidate คือข้อใด",
+  opts:["การหลั่ง histamine","อาการ myoclonus","ภาวะหลอดลมหดเกร็ง","ภาวะความดันโลหิตสูง"],ans:1,
+  exp:"<b>Myoclonus</b> พบได้ 30–60% จากการยับยั้ง subcortical ที่ควบคุมระบบ extrapyramidal ป้องกันได้ด้วยการให้ opioid หรือ benzodiazepine นำก่อน · etomidate ไม่กระตุ้น histamine และไม่มีผลต่อความดันมากนัก"},
+ {t:"nmb",stem:"Laudanosine เป็น metabolite ของยาชนิดใด",
+  opts:["Atracurium","Vecuronium","Rocuronium","Pancuronium"],ans:0,
+  exp:"<b>Atracurium</b> สลายด้วย Hofmann elimination ได้ laudanosine ซึ่งกระตุ้นระบบประสาทส่วนกลางและอาจทำให้ชักเมื่อสะสมสูง (พบในการให้ต่อเนื่องนานใน ICU) · cisatracurium ให้ laudanosine น้อยกว่ามากเพราะใช้ขนาดยาต่ำกว่า"},
+ {t:"vent",stem:"สารบ่งชี้ ethyl violet ใน soda lime จะเปลี่ยนสีอย่างไรเมื่อ absorbent หมดสภาพ",
+  opts:["ม่วงเปลี่ยนเป็นขาว","ขาวเปลี่ยนเป็นม่วง","เขียวเปลี่ยนเป็นเหลือง","ชมพูเปลี่ยนเป็นน้ำเงิน"],ans:1,
+  exp:"เมื่อ pH ลดลงจากการดูดซับ CO₂ indicator จะเปลี่ยนจาก<b>สีขาวเป็นสีม่วง</b> · ข้อควรระวังคือสีอาจ <b>จางกลับ (regeneration)</b> เมื่อพักไว้ ทำให้ดูเหมือนยังใช้ได้ทั้งที่หมดแล้ว จึงต้องยืนยันด้วยค่า inspired CO₂ เสมอ"},
+ {t:"op",stem:"Metabolite ใดของ meperidine ที่ทำให้เกิดอาการชัก",
+  opts:["Normeperidine","Norfentanyl","Morphine-3-glucuronide","Laudanosine"],ans:0,
+  exp:"<b>Normeperidine</b> กระตุ้นระบบประสาทส่วนกลาง ทำให้เกิด tremor, myoclonus และชัก โดยเฉพาะเมื่อสะสมในผู้ป่วยไตวาย · จุดสำคัญคือ <b>naloxone ไม่สามารถแก้อาการชักนี้ได้</b> และอาจทำให้แย่ลง"},
+ {t:"vol",stem:"ภาวะใดเกิดขึ้นในช่วง 5–10 นาทีแรกหลังหยุดให้ N₂O ความเข้มข้นสูงหากผู้ป่วยหายใจอากาศห้อง",
+  opts:["Methemoglobinemia","Diffusion hypoxia","Carbon monoxide poisoning","Hyperoxic vasoconstriction"],ans:1,
+  exp:"<b>Diffusion hypoxia</b> เกิดจาก N₂O แพร่ออกจากเลือดสู่ถุงลมอย่างรวดเร็ว เจือจางออกซิเจนและ CO₂ ในถุงลม → PaO₂ ลดลง · ป้องกันโดยให้ <b>ออกซิเจน 100% นาน 5–10 นาที</b> ก่อนย้ายผู้ป่วย"},
+ {t:"ind",stem:"หากฉีด thiopental เข้าหลอดเลือดแดงโดยบังเอิญ ควรทำสิ่งใด",
+  opts:["ยกแขนข้างที่ฉีดให้สูงกว่าระดับหัวใจ","ฉีด lidocaine เข้าทางหลอดเลือดแดงเส้นเดิม","รัด tourniquet เหนือตำแหน่งที่ฉีด","ประคบเย็นบริเวณที่ฉีดทันที"],ans:1,
+  exp:"Thiopental เป็นด่างแรง เมื่อเข้าหลอดเลือดแดงจะตกผลึกและทำให้หลอดเลือดหดเกร็งจนเนื้อเยื่อขาดเลือด · การจัดการคือ <b>คาเข็มไว้แล้วฉีด lidocaine หรือ papaverine เข้าเส้นเดิม</b> เพื่อขยายหลอดเลือด ร่วมกับให้ heparin และพิจารณาทำ stellate ganglion block"},
+ {t:"nmb",stem:"Sugammadex ไม่สามารถใช้แก้ฤทธิ์ยาชนิดใด",
+  opts:["Rocuronium","Vecuronium","Cisatracurium","Pancuronium"],ans:2,
+  exp:"Sugammadex จับได้เฉพาะยากลุ่ม <b>aminosteroid</b> (rocuronium, vecuronium, pancuronium) · <b>cisatracurium และ atracurium เป็นกลุ่ม benzylisoquinolinium</b> จึงต้องแก้ฤทธิ์ด้วย neostigmine ร่วมกับยา antimuscarinic แทน"},
+ {t:"vent",stem:"ค่า ETCO₂ ที่ตกลงสู่ศูนย์ทันทีเข้าได้กับภาวะใดน้อยที่สุด",
+  opts:["Circuit disconnection","การอุดกั้นท่อช่วยหายใจอย่างสมบูรณ์","ภาวะหัวใจหยุดเต้น","การรั่วของ cuff เพียงเล็กน้อย"],ans:3,
+  exp:"ETCO₂ ที่ตกเป็นศูนย์ทันทีหมายถึงไม่มีแก๊สผ่าน sensor เลย เข้าได้กับ disconnection, การอุดกั้นสมบูรณ์, esophageal intubation และภาวะไม่มี cardiac output · <b>cuff รั่วเล็กน้อย</b>ทำให้ค่าลดลงบางส่วนและรูปคลื่นผิดรูป ไม่ใช่ตกเป็นศูนย์"},
+ {t:"op",stem:"ข้อใดถูกต้องเกี่ยวกับระยะเวลาการออกฤทธิ์ของ naloxone",
+  opts:["ยาวกว่า opioid ทุกชนิดจึงให้ครั้งเดียวพอ","สั้นกว่า opioid หลายชนิดจึงเสี่ยงกลับมากดการหายใจซ้ำ","เท่ากับ morphine ทุกกรณีจึงไม่ต้องเฝ้าระวัง","ยาวกว่า fentanyl แต่สั้นกว่า remifentanil"],ans:1,
+  exp:"Naloxone ออกฤทธิ์เพียง <b>30–60 นาที</b> ซึ่งสั้นกว่าฤทธิ์ของ morphine, methadone และ neuraxial opioid มาก ผู้ป่วยจึงอาจเกิด <b>re-narcotization</b> ต้องเฝ้าระวังต่อเนื่องและอาจต้องให้ซ้ำหรือให้แบบ infusion"},
+ {t:"vol",stem:"ผู้ป่วยรายใดถือเป็นข้อห้ามของการใช้ N₂O มากที่สุด",
+  opts:["ผู้ป่วยที่มีประวัติคลื่นไส้อาเจียนหลังผ่าตัด","ผู้ป่วยที่มีฟองแก๊สในลูกตาหลังผ่าตัดจอตา","ผู้ป่วยที่มีความดันโลหิตสูงควบคุมได้","ผู้ป่วยที่มีภาวะโลหิตจางเล็กน้อย"],ans:1,
+  exp:"N₂O แพร่เข้าโพรงอากาศปิดได้เร็วกว่าที่ไนโตรเจนแพร่ออก จึง<b>ขยายปริมาตรและเพิ่มความดัน</b> · ห้ามใช้เมื่อมี intraocular gas bubble (เสี่ยงตาบอด), pneumothorax, ลำไส้อุดตัน, ผ่าตัดหูชั้นกลาง และ pneumocephalus"},
+ {t:"ind",stem:"ผู้ป่วยที่มีภาวะสมองบวมและความดันในกะโหลกศีรษะสูง ควรหลีกเลี่ยงยานำสลบชนิดใด",
+  opts:["Propofol","Thiopental","Etomidate","Ketamine"],ans:3,
+  exp:"<b>Ketamine เพิ่ม CBF, CMRO₂ และ ICP</b> รวมทั้งเพิ่มความดันโลหิต จึงควรหลีกเลี่ยงในผู้ป่วยกลุ่มนี้ · propofol และ thiopental ลดทั้ง CBF, CMRO₂ และ ICP จึงเป็นตัวเลือกที่เหมาะสมกว่า"},
+ {t:"nmb",stem:"ค่า TOF ratio เท่าใดที่ถือว่าปลอดภัยเพียงพอสำหรับการถอดท่อช่วยหายใจ",
+  opts:["มากกว่าหรือเท่ากับ 0.5","มากกว่าหรือเท่ากับ 0.7","มากกว่าหรือเท่ากับ 0.9","มากกว่าหรือเท่ากับ 1.2"],ans:2,
+  exp:"เกณฑ์ปัจจุบันคือ <b>TOF ratio ≥ 0.9</b> · ที่ค่า 0.7–0.9 ผู้ป่วยยังมีกล้ามเนื้อคอหอยอ่อนแรง กลืนบกพร่อง และการตอบสนองต่อภาวะพร่องออกซิเจนลดลง จึงเสี่ยงต่อการสำลักและทางเดินหายใจอุดกั้นหลังถอดท่อ"}
+]},
+
+{title:"ชุดที่ 2",qs:[
+ {t:"vent",stem:"ผู้ป่วยใส่ท่อช่วยหายใจอยู่ เครื่องเตือน High Airway Pressure ขึ้นทันที สาเหตุใดเป็นไปได้มากที่สุด",
+  opts:["การหลุดของข้อต่อในวงจรดมยา","การพับงอของท่อช่วยหายใจ","การรั่วของ cuff ท่อช่วยหายใจ","การหลุดของสาย sampling line"],ans:1,
+  exp:"แรงดันสูงเฉียบพลันบ่งถึงการอุดกั้นทางไหลของแก๊ส เช่น <b>ท่อพับงอ ผู้ป่วยกัดท่อ เสมหะอุด หรือ bronchospasm</b> · ในทางกลับกัน การหลุดของข้อต่อและ cuff รั่วจะทำให้แรงดัน<b>ต่ำ</b> (Low pressure alarm)"},
+ {t:"op",stem:"opioid ชนิดใดกระตุ้นการหลั่ง histamine น้อยที่สุด",
+  opts:["Morphine","Codeine","Meperidine","Fentanyl"],ans:3,
+  exp:"<b>Fentanyl</b> และอนุพันธ์ (sufentanil, remifentanil) แทบไม่กระตุ้นการหลั่ง histamine จึงเหมาะกับผู้ป่วยหอบหืดหรือผู้ที่ไวต่อ histamine · morphine, meperidine และ codeine ทำให้เกิดคัน ผื่นแดง ความดันตก และหลอดลมหดเกร็งได้"},
+ {t:"vol",stem:"ปัจจัยใดทำให้การนำสลบด้วยยาดมสลบช้าลง",
+  opts:["Minute ventilation ที่เพิ่มขึ้น","Cardiac output ที่เพิ่มขึ้น","Second gas effect","Blood:gas coefficient ที่ต่ำ"],ans:1,
+  exp:"<b>Cardiac output สูงทำให้ induction ช้าลง</b> เพราะเลือดที่ไหลผ่านปอดมากขึ้นพายาออกจากถุงลมเร็ว ทำให้ FA/FI ขึ้นช้า · ในทางกลับกัน ผู้ป่วยช็อกที่ cardiac output ต่ำจะสลบเร็วผิดปกติ ต้องลดขนาดยา"},
+ {t:"ind",stem:"ยานำสลบชนิดใดมีฤทธิ์ระงับปวด",
+  opts:["Thiopental","Ketamine","Etomidate","Propofol"],ans:1,
+  exp:"<b>Ketamine</b> เป็นยานำสลบชนิดเดียวในกลุ่มนี้ที่มีฤทธิ์ระงับปวดชัดเจนแม้ในขนาดต่ำกว่าขนาดนำสลบ · propofol, etomidate ไม่มีฤทธิ์ระงับปวด และ thiopental ในขนาดต่ำอาจทำให้ไวต่อความเจ็บปวดมากขึ้น"},
+ {t:"nmb",stem:"ผู้ป่วยรายใดเสี่ยงต่อภาวะโพแทสเซียมในเลือดสูงรุนแรงหลังได้ succinylcholine มากที่สุด",
+  opts:["ผู้ป่วยไฟไหม้รุนแรงเมื่อ 3 สัปดาห์ก่อน","ผู้ป่วยที่ถูกน้ำร้อนลวกเมื่อ 2 ชั่วโมงก่อน","ผู้ป่วยไตวายเรื้อรังที่โพแทสเซียมปกติ","ผู้ป่วยที่งดอาหารมาแล้ว 12 ชั่วโมง"],ans:0,
+  exp:"หลังแผลไหม้รุนแรง กล้ามเนื้อสร้าง <b>extrajunctional acetylcholine receptor เพิ่มขึ้น</b> ทำให้ปล่อยโพแทสเซียมมหาศาลจนหัวใจหยุดเต้น · ช่วงเสี่ยงเริ่มประมาณ <b>24–48 ชั่วโมงหลังบาดเจ็บและคงอยู่นานถึง 1–2 ปี</b> ส่วนภายใน 24 ชั่วโมงแรกยังใช้ได้"},
+ {t:"vent",stem:"Bain circuit จัดอยู่ในระบบ Mapleson ชนิดใด",
+  opts:["Mapleson A แบบ coaxial","Mapleson D แบบ coaxial","Mapleson E ที่ไม่มีลิ้น","Mapleson F ที่มีถุงลม"],ans:1,
+  exp:"Bain เป็น <b>coaxial Mapleson D</b> โดยท่อ fresh gas อยู่ภายในท่อหายใจออก · จุดอ่อนเฉพาะคือ <b>inner tube หักหรือหลุด</b> ทำให้เกิด dead space และ rebreathing รุนแรงทั้งที่ภายนอกดูปกติ จึงต้องทำ Pethick test ก่อนใช้"},
+ {t:"op",stem:"Tramadol ออกฤทธิ์ระงับปวดผ่านกลไกใด",
+  opts:["Kappa agonist ร่วมกับการยับยั้ง COX","Mu agonist ร่วมกับการยับยั้ง reuptake ของ serotonin และ norepinephrine","Partial mu agonist ร่วมกับการกระตุ้น GABA","Mu antagonist ร่วมกับการกระตุ้น NMDA"],ans:1,
+  exp:"Tramadol เป็น <b>weak mu-agonist ร่วมกับยับยั้ง reuptake ของ serotonin และ norepinephrine</b> · ผลข้างเคียงที่ต้องระวังคือ <b>ชัก</b> (ลด seizure threshold) และ <b>serotonin syndrome</b> เมื่อใช้ร่วมกับ SSRI, SNRI หรือ MAOI"},
+ {t:"vol",stem:"ปัจจัยใดทำให้ค่า MAC เพิ่มขึ้น",
+  opts:["ภาวะตั้งครรภ์","อายุที่มากขึ้น","การดื่มสุราเรื้อรัง","ภาวะอุณหภูมิกายต่ำ"],ans:2,
+  exp:"<b>MAC เพิ่ม</b>: ไข้สูง, ดื่มสุราเรื้อรัง, hypernatremia, ยากระตุ้นแบบเฉียบพลัน, ทารกอายุ 3–6 เดือน, ผมแดง · <b>MAC ลด</b>: อายุมาก, ตั้งครรภ์, hypothermia, ดื่มสุราเฉียบพลัน, opioid, benzodiazepine, hyponatremia, lithium"},
+ {t:"ind",stem:"ข้อจำกัดสำคัญที่ทำให้ไม่ใช้ etomidate แบบ infusion ต่อเนื่องคือข้อใด",
+  opts:["การกดการสร้างฮอร์โมนจากต่อมหมวกไต","การกดการทำงานของไขกระดูก","การเกิดไตวายเฉียบพลัน","การเกิดตับอักเสบเฉียบพลัน"],ans:0,
+  exp:"Etomidate ยับยั้งเอนไซม์ <b>11-beta-hydroxylase</b> ทำให้เกิด adrenocortical suppression ซึ่งอาจคงอยู่ 24–48 ชั่วโมงแม้ให้เพียงครั้งเดียว · จึงห้ามให้ต่อเนื่อง และต้องระวังเป็นพิเศษในผู้ป่วย sepsis"},
+ {t:"nmb",stem:"ยาหย่อนกล้ามเนื้อชนิดใดมี onset เร็วที่สุดในกลุ่ม non-depolarizing",
+  opts:["Rocuronium","Vecuronium","Cisatracurium","Pancuronium"],ans:0,
+  exp:"<b>Rocuronium</b> ออกฤทธิ์ภายใน 60–90 วินาทีเมื่อใช้ขนาด 1.0–1.2 mg/kg จึงใช้ทดแทน succinylcholine ในการทำ RSI ได้ · แต่ duration ยาว 30–60 นาที และขับทางตับกับน้ำดีเป็นหลัก"},
+ {t:"vent",stem:"เครื่องเตือน High Peak Airway Pressure พร้อม tidal volume ลดลงมาก สิ่งแรกที่ควรทำคือข้อใด",
+  opts:["พ่นยาขยายหลอดลมทันที","เปลี่ยนมาบีบ manual เพื่อประเมินความยืดหยุ่นของปอด","เพิ่มขีดจำกัดแรงดันบนหน้าจอ","ถอดท่อช่วยหายใจออกทันที"],ans:1,
+  exp:"หลักการคือ <b>ตัดเครื่องออกแล้วบีบ manual</b> — ถ้าบีบแล้วฝืด ปัญหาอยู่ที่ผู้ป่วยหรือท่อช่วยหายใจ (bronchospasm, kinking, เสมหะ) ถ้าบีบแล้วไหลสะดวก ปัญหาอยู่ที่เครื่องหรือวงจร · การเพิ่ม pressure limit เป็นการซ่อนปัญหา"},
+ {t:"op",stem:"ผู้ป่วยได้รับ morphine ทาง epidural เมื่อ 12 ชั่วโมงก่อน ขณะนี้ซึมและหายใจ 6 ครั้งต่อนาที ควรจัดการอย่างไร",
+  opts:["สังเกตอาการต่อเพราะยาใกล้หมดฤทธิ์","ให้ naloxone และตามด้วยการให้แบบต่อเนื่อง","ให้ flumazenil ทางหลอดเลือดดำ","ใส่ท่อช่วยหายใจโดยไม่ให้ยาแก้ฤทธิ์"],ans:1,
+  exp:"Neuraxial morphine เป็น hydrophilic จึงอยู่ใน CSF นานและกระจายขึ้นสูง ทำให้เกิด <b>delayed respiratory depression ได้ถึง 6–24 ชั่วโมง</b> · ต้องให้ naloxone แต่เพราะ naloxone ออกฤทธิ์สั้นกว่า จึงต้องตามด้วย infusion และเฝ้าระวังต่อเนื่อง"},
+ {t:"vol",stem:"การเพิ่มความเข้มข้นของ desflurane อย่างรวดเร็วทำให้เกิดการเปลี่ยนแปลงใด",
+  opts:["ความดันโลหิตและชีพจรลดลงเฉียบพลัน","ความดันโลหิตและชีพจรเพิ่มขึ้นเฉียบพลัน","อุณหภูมิกายสูงขึ้นเฉียบพลัน","ระดับน้ำตาลในเลือดลดลงเฉียบพลัน"],ans:1,
+  exp:"Desflurane มีกลิ่นฉุนและระคายทางเดินหายใจ การเพิ่มความเข้มข้นเร็วกระตุ้น <b>sympathetic surge</b> ทำให้ความดันและชีพจรพุ่งสูงชั่วคราว · จึงควรเพิ่มทีละน้อยและไม่ใช้ทำ inhalation induction"},
+ {t:"ind",stem:"ยาใดใช้แก้ฤทธิ์ midazolam",
+  opts:["Naloxone","Flumazenil","Sugammadex","Neostigmine"],ans:1,
+  exp:"<b>Flumazenil</b> เป็น benzodiazepine receptor antagonist ใช้แก้ฤทธิ์ midazolam และ diazepam · naloxone แก้ opioid, sugammadex และ neostigmine แก้ยาหย่อนกล้ามเนื้อ ส่วน propofol ไม่มียาแก้ฤทธิ์จำเพาะ"},
+ {t:"nmb",stem:"ภาวะใดเสริมฤทธิ์ของยาหย่อนกล้ามเนื้อกลุ่ม non-depolarizing",
+  opts:["Hypercalcemia","Hypokalemia","Hypomagnesemia","Metabolic alkalosis"],ans:1,
+  exp:"<b>Hypokalemia</b> ทำให้เยื่อหุ้มเซลล์ hyperpolarize จึงเสริมฤทธิ์ยาและทำให้ออกฤทธิ์นานขึ้น · ภาวะอื่นที่เสริมฤทธิ์: <b>hypermagnesemia, hypocalcemia, acidosis และ hypothermia</b>"},
+ {t:"vent",stem:"อุปกรณ์ใดตรวจจับภาวะ hypoxic gas mixture ที่ปลายทางได้โดยตรง",
+  opts:["Oxygen analyzer","Fail-safe valve","Second-stage regulator","Pin index safety system"],ans:0,
+  exp:"<b>Oxygen analyzer</b> วัดความเข้มข้นออกซิเจนจริงในแก๊สที่ไหลถึงผู้ป่วย จึงเป็นด่านสุดท้ายที่ตรวจจับ hypoxic mixture ได้โดยตรง · fail-safe อาศัย 'ความดัน' ออกซิเจน ส่วน PISS/DISS เป็นระบบกันต่อผิดเชิงกลไก"},
+ {t:"op",stem:"opioid ชนิดใดมีฤทธิ์เป็น NMDA-receptor antagonist ร่วมด้วย",
+  opts:["Morphine","Oxycodone","Methadone","Hydromorphone"],ans:2,
+  exp:"<b>Methadone</b> เป็น mu-agonist ที่มีฤทธิ์ NMDA antagonist ร่วม จึงมีบทบาทในปวดเรื้อรังและปวดแบบ neuropathic · ข้อควรระวังคือ half-life ยาวและไม่แน่นอน และเสี่ยง <b>QT prolongation</b>"},
+ {t:"vol",stem:"ยาดมสลบชนิดสูดดมส่งผลต่อสมองอย่างไรที่ความเข้มข้น 1 MAC",
+  opts:["เพิ่มทั้ง CBF และ CMRO₂","เพิ่ม CBF แต่ลด CMRO₂","ลดทั้ง CBF และ CMRO₂","ลด CBF แต่เพิ่ม CMRO₂"],ans:1,
+  exp:"Volatile agent ทำให้เกิด <b>cerebral vasodilation → CBF เพิ่ม</b> ขณะที่ลดการเผาผลาญของสมอง = ภาวะ <b>uncoupling</b> · ผลคือ cerebral blood volume และ ICP เพิ่มขึ้น จึงต้องระวังในผู้ป่วยผ่าตัดสมอง"},
+ {t:"ind",stem:"ยานำสลบชนิดใดกดการทำงานของกล้ามเนื้อหัวใจมากที่สุด",
+  opts:["Etomidate","Ketamine","Midazolam","Thiopental"],ans:3,
+  exp:"<b>Thiopental</b> กดกล้ามเนื้อหัวใจโดยตรงมากที่สุดในกลุ่มนี้ ร่วมกับ venodilation ทำให้ preload ลด จึงเสี่ยงความดันตกรุนแรงในผู้ป่วย hypovolemia · etomidate มีผลน้อยที่สุด และ ketamine มักทำให้ความดันเพิ่มขึ้น"},
+ {t:"nmb",stem:"เหตุใดจึงต้องให้ glycopyrrolate หรือ atropine ร่วมกับ neostigmine",
+  opts:["เพื่อเสริมฤทธิ์การแก้ยาหย่อนกล้ามเนื้อให้เร็วขึ้น","เพื่อลดผลข้างเคียงที่ muscarinic receptor","เพื่อป้องกันการเกิด recurarization ภายหลัง","เพื่อเพิ่มระดับ acetylcholine ที่รอยต่อประสาทกล้ามเนื้อ"],ans:1,
+  exp:"Acetylcholine ที่เพิ่มขึ้นออกฤทธิ์ทั้งที่ nicotinic (ผลที่ต้องการ) และ <b>muscarinic (ผลข้างเคียง: ชีพจรช้า น้ำลายมาก ลำไส้บีบตัว หลอดลมตีบ)</b> · จึงต้องให้ยา antimuscarinic ควบคู่ โดยเลือก glycopyrrolate คู่ neostigmine เพราะ onset ใกล้เคียงกัน"}
+]},
+
+{title:"ชุดที่ 3",qs:[
+ {t:"vent",stem:"ถัง O₂ ชนิด E เต็มที่ความดัน 1,900 psi บรรจุ 660 ลิตร ขณะนี้เกจอ่านได้ 1,100 psi เปิด flow 7 ลิตรต่อนาที จะใช้ได้อีกประมาณกี่นาที",
+  opts:["45 นาที","55 นาที","65 นาที","95 นาที"],ans:1,
+  exp:"ออกซิเจนในถังเป็นแก๊สอัดที่ไม่มีสถานะของเหลว ปริมาตรจึง<b>แปรผันตรงกับความดัน</b> · ต่างจาก N₂O ที่เป็นของเหลว เกจจะไม่ลดลงจนกว่าของเหลวจะหมด",
+  calc:"V คงเหลือ = 660 × (1100 / 1900) ≈ 382 L\nเวลา = 382 / 7 ≈ 54.6 นาที ≈ 55 นาที"},
+ {t:"op",stem:"อาการใดของ opioid ที่แทบไม่เกิดการดื้อยาแม้ใช้ต่อเนื่องเป็นเวลานาน",
+  opts:["การกดการหายใจ","อาการง่วงซึม","อาการคลื่นไส้","อาการท้องผูก"],ans:3,
+  exp:"ผู้ป่วยเกิด tolerance ต่อการกดหายใจ ง่วงซึม คลื่นไส้ และฤทธิ์ระงับปวด แต่<b>แทบไม่เกิด tolerance ต่ออาการท้องผูกและรูม่านตาหด</b> · จึงต้องให้ยาระบายควบคู่ในผู้ป่วยที่ใช้ opioid ระยะยาว"},
+ {t:"vol",stem:"ค่า MAC-awake มีค่าประมาณเท่าใดเมื่อเทียบกับ 1 MAC",
+  opts:["0.3–0.4 MAC","0.6–0.7 MAC","1.0 MAC","1.3 MAC"],ans:0,
+  exp:"<b>MAC-awake ≈ 0.3–0.4 MAC</b> คือความเข้มข้นที่ผู้ป่วยครึ่งหนึ่งตอบสนองต่อคำสั่ง ใช้ทำนายช่วงที่ผู้ป่วยจะตื่น · MAC มาตรฐาน = ไม่ขยับต่อ skin incision ในผู้ป่วย 50% และ <b>MAC-BAR ≈ 1.3 MAC</b>"},
+ {t:"ind",stem:"ผู้ป่วยที่มีโรคใดถือเป็นข้อห้ามของการใช้ barbiturate",
+  opts:["ความดันโลหิตสูง","Porphyria","หอบหืดที่ควบคุมได้","หัวใจล้มเหลว"],ans:1,
+  exp:"Barbiturate กระตุ้นเอนไซม์ ALA synthetase เพิ่มการสร้าง porphyrin จึงกระตุ้น <b>acute porphyria attack</b> (ปวดท้อง อ่อนแรง ชัก) ถือเป็นข้อห้ามเด็ดขาด · ส่วนโรคอื่นเป็นข้อควรระวังแต่ไม่ใช่ข้อห้ามเด็ดขาด"},
+ {t:"nmb",stem:"ผู้ป่วยที่มีทั้งภาวะตับวายและไตวายควรเลือกใช้ยาหย่อนกล้ามเนื้อชนิดใด",
+  opts:["Cisatracurium","Pancuronium","Rocuronium","Vecuronium"],ans:0,
+  exp:"<b>Cisatracurium</b> ใช้ Hofmann elimination ซึ่งเป็นการสลายตัวทางเคมีในกระแสเลือดที่ขึ้นกับ pH และอุณหภูมิ ไม่ต้องพึ่งตับหรือไต · pancuronium ขับทางไต ส่วน rocuronium และ vecuronium ขับทางตับ จึงออกฤทธิ์นานผิดปกติ"},
+ {t:"vent",stem:"ในการทำ low-flow anesthesia เหตุใดค่าความเข้มข้นของยาที่ผู้ป่วยได้รับจริงจึงตามค่าที่ตั้งบน vaporizer ได้ช้า",
+  opts:["เพราะ absorbent ดูดซับยาไว้จนหมด","เพราะเมื่อ FGF ต่ำ ปริมาตรแก๊สในวงจรถูกเปลี่ยนแทนที่ช้า","เพราะ vaporizer จ่ายยาได้น้อยลงตาม FGF","เพราะลิ้นกันกลับในวงจรรั่ว"],ans:1,
+  exp:"Time constant ของระบบ ≈ <b>ปริมาตรวงจร ÷ fresh gas flow</b> เมื่อ FGF ต่ำ ตัวหารเล็กลง time constant จึงยาวขึ้นมาก · ความเข้มข้นจริงถูกกำหนดโดยแก๊สที่ไหลวนในวงจร ไม่ใช่ค่าที่ตั้งบน dial",
+  calc:"τ = V_circuit / FGF\nFGF ต่ำ → τ ยาว → wash-in ช้า\n(≈63% ของค่าใหม่ต่อ 1 τ, ~95% ที่ 3 τ)"},
+ {t:"op",stem:"Fentanyl 100 ไมโครกรัมทางหลอดเลือดดำมีฤทธิ์ระงับปวดเทียบเท่ากับ morphine ประมาณกี่มิลลิกรัม",
+  opts:["1 มิลลิกรัม","5 มิลลิกรัม","10 มิลลิกรัม","50 มิลลิกรัม"],ans:2,
+  exp:"อัตราส่วน equianalgesic โดยประมาณคือ fentanyl แรงกว่า morphine ประมาณ <b>100 เท่า</b> ดังนั้น fentanyl 100 mcg ≈ <b>morphine 10 mg IV</b> · ใช้เป็นหลักคร่าว ๆ และควรลดขนาดลงเผื่อ incomplete cross-tolerance"},
+ {t:"vol",stem:"ยาดมสลบชนิดใดถูกเปลี่ยนแปลงที่ตับในสัดส่วนมากที่สุด",
+  opts:["Desflurane","Isoflurane","Sevoflurane","Halothane"],ans:3,
+  exp:"สัดส่วนการ metabolize โดยประมาณ: desflurane ~0.02%, isoflurane ~0.2%, sevoflurane ~5%, <b>halothane ~20%</b> · ยิ่ง metabolize มากยิ่งเสี่ยงพิษต่ออวัยวะ จึงเป็นที่มาของ halothane hepatitis"},
+ {t:"ind",stem:"อาการใดไม่เกิดจากยา ketamine",
+  opts:["ความดันโลหิตสูง","ประสาทหลอน","ตากลอกไปมา","หลอดลมหดเกร็ง"],ans:3,
+  exp:"Ketamine <b>ขยายหลอดลม</b> จึงเหมาะกับผู้ป่วยหอบหืด ไม่ได้ทำให้เกิด bronchospasm · ส่วนความดันสูง ชีพจรเร็ว, emergence delirium และ nystagmus เป็นผลที่พบได้จริงจากยานี้"},
+ {t:"nmb",stem:"การทำ precurarization ก่อนให้ succinylcholine ไม่สามารถป้องกันภาวะใดได้",
+  opts:["อาการปวดกล้ามเนื้อหลังผ่าตัด","ระดับโพแทสเซียมในเลือดที่สูงขึ้น","ความดันในลูกตาที่เพิ่มขึ้น","ความดันในกะโหลกศีรษะที่เพิ่มขึ้น"],ans:1,
+  exp:"Precurarization ลด fasciculation, myalgia, IOP และ ICP ที่เพิ่มขึ้นได้ · แต่ <b>ไม่สามารถป้องกัน hyperkalemia</b> จึงไม่ทำให้ succinylcholine ปลอดภัยขึ้นในผู้ป่วยที่เสี่ยงต่อโพแทสเซียมสูง"},
+ {t:"vent",stem:"Capnography แสดง baseline ที่ไม่กลับสู่ศูนย์ โดยเพิ่งเปลี่ยน absorbent ใหม่และ leak test ปกติ สาเหตุใดเป็นไปได้มากที่สุด",
+  opts:["Absorbent หมดสภาพ","ลิ้นหายใจออกปิดไม่สนิท","การหายใจเร็วเกินไป","สาย sampling line อุดตัน"],ans:1,
+  exp:"Baseline ที่ยกสูงหมายถึง rebreathing ซึ่งเกิดได้จาก absorbent หมด <b>หรือ</b> unidirectional valve ทำงานผิดปกติ · เมื่อ absorbent เพิ่งเปลี่ยนและ leak test ปกติ ตัวการที่เหลือคือ <b>incompetent expiratory valve</b>"},
+ {t:"op",stem:"ผู้ป่วย biliary colic ได้รับ opioid แล้วปวดมากขึ้น เกิดจากกลไกใด",
+  opts:["การหลั่ง histamine","การหดเกร็งของ sphincter of Oddi","การเพิ่มการไหลของน้ำดี","การหดตัวของหลอดเลือดในช่องท้อง"],ans:1,
+  exp:"Opioid ทำให้เกิด <b>sphincter of Oddi spasm</b> เพิ่มความดันในท่อน้ำดี จึงทำให้ปวด biliary colic แย่ลง · อาจเลือก opioid ที่กระตุ้นน้อยกว่า ใช้ยาแก้ปวดกลุ่มอื่นร่วม และให้ยาคลายเกร็งเมื่อจำเป็น"},
+ {t:"vol",stem:"อาการแสดงใดของ malignant hyperthermia ที่ตรวจพบได้เร็วและไวที่สุด",
+  opts:["อุณหภูมิกายที่สูงขึ้นอย่างรวดเร็ว","ปัสสาวะที่มีสีเข้มคล้ายน้ำโคล่า","ค่า ETCO₂ ที่สูงขึ้นอย่างต่อเนื่อง","ระดับ creatine kinase ที่สูงขึ้น"],ans:2,
+  exp:"<b>ETCO₂ ที่สูงขึ้นต่อเนื่องแม้เพิ่ม minute ventilation แล้ว</b> เป็นสัญญาณที่เร็วและไวที่สุด สะท้อนภาวะ hypermetabolism · <b>อุณหภูมิที่สูงขึ้นเป็นอาการที่มาทีหลัง</b> ส่วน myoglobinuria และ CK สูงเป็นผลตามมาในระยะท้าย"},
+ {t:"ind",stem:"ยานำสลบชนิดใดเหมาะสมที่สุดสำหรับผู้ป่วย severe aortic stenosis ที่ความดันค่อนข้างต่ำ",
+  opts:["Propofol","Etomidate","Ketamine","Dexmedetomidine"],ans:1,
+  exp:"Severe AS ต้องคงความดันและ SVR ไว้ (coronary perfusion ขึ้นกับ diastolic pressure) และคง sinus rhythm · <b>Etomidate</b> แทบไม่กระทบ hemodynamic จึงเหมาะที่สุด · propofol ลด SVR รุนแรง, ketamine เพิ่ม HR ทำให้ diastolic filling ลด"},
+ {t:"nmb",stem:"กลุ่มกล้ามเนื้อใดฟื้นตัวจากยาหย่อนกล้ามเนื้อได้ช้าที่สุด",
+  opts:["Adductor pollicis","Diaphragm","กล้ามเนื้อบริเวณคอหอย","Orbicularis oculi"],ans:2,
+  exp:"<b>กล้ามเนื้อคอหอยไวต่อยามากที่สุดและฟื้นตัวช้าที่สุด</b> ผู้ป่วยจึงกลืนไม่ได้และเสี่ยงสำลักทั้งที่กำลังของมือดูปกติแล้ว · ตรงข้ามกับกะบังลมที่ดื้อต่อยามากที่สุดและฟื้นเร็วที่สุด"},
+ {t:"vent",stem:"ข้อใดถูกต้องเกี่ยวกับความแตกต่างระหว่างโหมด volume-controlled และ pressure-controlled",
+  opts:["VC คง tidal volume ส่วน PC คงแรงดันสูงสุด","VC คงแรงดันสูงสุด ส่วน PC คง tidal volume","ทั้งสองโหมดคงทั้งปริมาตรและแรงดันเท่ากัน","PC ใช้ไม่ได้ในผู้ป่วยที่ compliance ต่ำ"],ans:0,
+  exp:"<b>VC</b> กำหนด tidal volume คงที่ แรงดันจึงแปรตาม compliance (compliance แย่ = peak pressure สูงขึ้น) · <b>PC</b> กำหนดแรงดันคงที่ tidal volume จึงแปรตาม compliance (compliance แย่ = TV ลดลง) ต้องเฝ้าระวัง hypoventilation"},
+ {t:"op",stem:"Codeine ให้ผลระงับปวดโดยต้องอาศัยกระบวนการใด",
+  opts:["การเปลี่ยนเป็น morphine ผ่านเอนไซม์ CYP2D6","การจับ mu receptor โดยตรงโดยไม่เปลี่ยนแปลง","การยับยั้ง COX ที่เนื้อเยื่อส่วนปลาย","การเปลี่ยนเป็น normeperidine ผ่านตับ"],ans:0,
+  exp:"Codeine เป็น <b>prodrug</b> ต้องถูกเปลี่ยนเป็น morphine ผ่าน <b>CYP2D6</b> จึงออกฤทธิ์ · poor metabolizer จะได้ผลระงับปวดน้อย ขณะที่ ultrarapid metabolizer เสี่ยงได้ morphine สูงเกินจนกดการหายใจ โดยเฉพาะในเด็ก"},
+ {t:"vol",stem:"ขนาดเริ่มต้นของ dantrolene ในการรักษา malignant hyperthermia คือข้อใด",
+  opts:["1 mg/kg","2.5 mg/kg","5 mg/kg","10 mg/kg"],ans:1,
+  exp:"Dantrolene ขนาดเริ่มต้น <b>2.5 mg/kg ทางหลอดเลือดดำ</b> ให้ซ้ำได้จนอาการดีขึ้น (โดยทั่วไปรวมไม่เกิน ~10 mg/kg) · ร่วมกับหยุด trigger agent ทั้งหมด ให้ออกซิเจน 100% high flow ลดอุณหภูมิกาย และแก้ hyperkalemia กับภาวะเลือดเป็นกรด"},
+ {t:"ind",stem:"เกณฑ์ใดบ่งชี้ว่าการทำ preoxygenation เพียงพอแล้ว",
+  opts:["ค่า end-tidal O₂ มากกว่าหรือเท่ากับ 90%","ค่า SpO₂ มากกว่าหรือเท่ากับ 95%","ค่า end-tidal CO₂ น้อยกว่า 35 mmHg","ค่า FiO₂ ที่ตั้งบนเครื่องเท่ากับ 100%"],ans:0,
+  exp:"<b>End-tidal O₂ ≥ 90%</b> บ่งบอกว่าไนโตรเจนในปอดถูกแทนที่ด้วยออกซิเจนแล้ว (denitrogenation) · SpO₂ 100% ไม่ได้แปลว่าเพียงพอ เพราะสะท้อนเฉพาะฮีโมโกลบินที่อิ่มตัว ไม่ได้บอกปริมาณ oxygen reservoir ใน FRC"},
+ {t:"nmb",stem:"ผู้ป่วย myasthenia gravis ตอบสนองต่อยาหย่อนกล้ามเนื้ออย่างไร",
+  opts:["ไวต่อกลุ่ม non-depolarizing และดื้อต่อ succinylcholine","ดื้อต่อกลุ่ม non-depolarizing และไวต่อ succinylcholine","ไวต่อยาทั้งสองกลุ่มเท่ากัน","ดื้อต่อยาทั้งสองกลุ่มเท่ากัน"],ans:0,
+  exp:"MG มีจำนวน acetylcholine receptor <b>ลดลง</b> จาก autoantibody → <b>ไวต่อ non-depolarizing มาก</b> (ต้องลดขนาดเหลือ 1/10–1/2) และ <b>ดื้อต่อ succinylcholine</b> · ตรงข้ามกับ Eaton-Lambert syndrome ที่ไวต่อยาทั้งสองกลุ่ม"}
+]},
+
+{title:"ชุดที่ 4",qs:[
+ {t:"vent",stem:"ผลของการตั้ง PEEP สูงต่อระบบไหลเวียนเลือดคือข้อใด",
+  opts:["เพิ่ม venous return และ cardiac output","ลดความดันในช่องอก","ลด venous return ทำให้ preload และความดันลดลง","ไม่มีผลต่อระบบไหลเวียนเลือด"],ans:2,
+  exp:"PEEP เพิ่ม <b>intrathoracic pressure</b> กด vena cava ทำให้ <b>venous return ลดลง → preload, cardiac output และความดันลดลง</b> โดยเฉพาะในผู้ป่วย hypovolemia · ประโยชน์ของ PEEP คือเพิ่ม FRC และแก้ atelectasis จึงต้องชั่งน้ำหนักสองด้าน"},
+ {t:"op",stem:"การฉีด fentanyl ขนาดสูงอย่างรวดเร็วขณะนำสลบทำให้เกิดภาวะเฉียบพลันใด",
+  opts:["Malignant hyperthermia","Chest wall rigidity","Coronary steal","Histamine flush"],ans:1,
+  exp:"Fentanyl ขนาดสูงฉีดเร็วทำให้เกิด <b>chest wall (truncal) rigidity</b> จนช่วยหายใจด้วย bag-mask ได้ยาก · แก้ไขด้วยการให้ยาหย่อนกล้ามเนื้อและ/หรือ naloxone จึงควรฉีดช้า ๆ และเตรียมพร้อมควบคุมทางเดินหายใจ"},
+ {t:"vol",stem:"Second gas effect เกิดจากกลไกใด",
+  opts:["N₂O จับ receptor เดียวกับยาดมสลบชนิดที่สอง","N₂O ลดค่า blood:gas coefficient ของยาชนิดที่สอง","การดูดซึม N₂O ปริมาณมากทำให้ความเข้มข้นของแก๊สที่เหลือในถุงลมสูงขึ้น","N₂O เพิ่มเลือดที่ไหลผ่านปอดจนพายาเข้าสู่กระแสเลือดเร็วขึ้น"],ans:2,
+  exp:"<b>Second gas effect</b>: N₂O ถูกดูดซึมออกจากถุงลมอย่างรวดเร็วในปริมาณมาก ทำให้ปริมาตรแก๊สในถุงลมลดลง ความเข้มข้นของแก๊สที่เหลือจึงสูงขึ้นและเร่งการนำสลบ · กลไกเดียวกันเมื่อมองที่ N₂O เองเรียกว่า concentration effect"},
+ {t:"ind",stem:"ข้อใดไม่ใช่อาการที่พบใน propofol infusion syndrome",
+  opts:["ภาวะโพแทสเซียมในเลือดสูง","ภาวะไตรกลีเซอไรด์ในเลือดต่ำ","ภาวะเลือดเป็นกรดจากแลคเตท","ภาวะกล้ามเนื้อลายสลาย"],ans:1,
+  exp:"PRIS ประกอบด้วย <b>lactic acidosis, rhabdomyolysis, hyperkalemia, ไตวายเฉียบพลัน, หัวใจล้มเหลว และ hypertriglyceridemia</b> คือไขมันในเลือด<b>สูง</b> ไม่ใช่ต่ำ · มักพบเมื่อให้ยาเกิน 4 mg/kg/hr นานเกิน 48 ชั่วโมง"},
+ {t:"nmb",stem:"ยาหย่อนกล้ามเนื้อชนิดใดมีฤทธิ์ vagolytic ทำให้ชีพจรเร็วขึ้น",
+  opts:["Atracurium","Pancuronium","Cisatracurium","Vecuronium"],ans:1,
+  exp:"<b>Pancuronium</b> ยับยั้ง muscarinic receptor ที่หัวใจและยับยั้งการเก็บกลับ norepinephrine ทำให้ <b>ชีพจรเร็ว ความดันสูง cardiac output เพิ่ม</b> · จึงไม่เหมาะกับผู้ป่วยโรคหัวใจขาดเลือดหรือหัวใจเต้นเร็วอยู่เดิม"},
+ {t:"vent",stem:"ผู้ป่วย COPD มีภาวะ air trapping ควรปรับเครื่องช่วยหายใจอย่างไร",
+  opts:["เพิ่มอัตราการหายใจเป็น 24 ครั้งต่อนาที","ลดอัตราการหายใจและยืดเวลาหายใจออก","เพิ่ม tidal volume เป็น 10 ml/kg","เพิ่ม PEEP ให้สูงขึ้นทันที"],ans:1,
+  exp:"ภาวะ obstructive เสี่ยง <b>air trapping และ auto-PEEP</b> จึงต้อง<b>ลดอัตราการหายใจและยืดเวลาหายใจออก</b> (I:E 1:3–1:4) ให้ปอดระบายลมออกได้หมดก่อนรอบถัดไป · การเพิ่ม RR หรือ TV จะยิ่งทำให้ trapping แย่ลงและเสี่ยง barotrauma"},
+ {t:"op",stem:"Buprenorphine มีคุณสมบัติทางเภสัชวิทยาข้อใด",
+  opts:["Partial mu-agonist ที่มี ceiling effect ต่อการกดการหายใจ","Full mu-agonist ที่ไม่มี ceiling effect","Pure antagonist ที่ใช้แก้พิษ opioid","Kappa-agonist ที่ใช้ระงับอาการหนาวสั่น"],ans:0,
+  exp:"<b>Buprenorphine</b> เป็น partial mu-agonist ที่จับ receptor แน่นและมี <b>ceiling effect</b> ต่อการกดการหายใจ ใช้ในการรักษาการติด opioid · ข้อควรระวังคือแทนที่ full agonist บน receptor ได้ อาจกระตุ้น withdrawal และดื้อต่อ naloxone ขนาดปกติ"},
+ {t:"vol",stem:"เหตุใด desflurane จึงต้องใช้ vaporizer ชนิดพิเศษที่ให้ความร้อนและควบคุมความดัน",
+  opts:["เพราะมีค่า MAC สูงกว่ายาชนิดอื่น","เพราะมีจุดเดือดใกล้เคียงอุณหภูมิห้อง","เพราะละลายในเลือดได้น้อยที่สุด","เพราะสลายตัวเมื่อสัมผัส CO₂ absorbent"],ans:1,
+  exp:"Desflurane มี<b>จุดเดือดประมาณ 22.8°C</b> ใกล้อุณหภูมิห้องและมี vapor pressure สูงมาก จึงเดือดได้เองที่อุณหภูมิห้อง ต้องใช้ vaporizer ที่<b>อุ่นถึง ~39°C และปรับความดันเป็น 2 บรรยากาศ</b> · ค่า blood:gas ต่ำเป็นเหตุผลที่ฟื้นเร็ว ไม่ใช่เหตุผลของ vaporizer พิเศษ"},
+ {t:"ind",stem:"ชาย 18 ปี น้ำหนัก 80 กิโลกรัม มาผ่าตัดกระดูก วัดความดันได้ 80/70 mmHg ชีพจร 130 ครั้งต่อนาที ควรเลือกยานำสลบข้อใด",
+  opts:["Etomidate 16 mg","Ketamine 240 mg","Midazolam 15 mg","Propofol 160 mg"],ans:0,
+  exp:"ผู้ป่วยอยู่ในภาวะ hypovolemic shock ต้องเลือกยาที่กระทบ hemodynamic น้อยที่สุดในขนาดที่ถูกต้อง · <b>Etomidate 16 mg = 0.2 mg/kg</b> เป็นขนาดมาตรฐาน · ketamine 240 mg = 3 mg/kg เกินขนาด และ propofol 160 mg = 2 mg/kg จะทำให้ความดันตกรุนแรง"},
+ {t:"nmb",stem:"ผู้ป่วยได้ succinylcholine ขนาดปกติเพียงครั้งเดียว แต่กล้ามเนื้อไม่คลายตัวนานถึง 3 ชั่วโมง สาเหตุใดเป็นไปได้มากที่สุด",
+  opts:["ภาวะ malignant hyperthermia ระยะเริ่มต้น","ภาวะ atypical pseudocholinesterase","ภาวะ phase 2 block จากยาเกินขนาด","ภาวะ myasthenia gravis ที่ยังไม่ได้วินิจฉัย"],ans:1,
+  exp:"<b>Atypical หรือการขาด pseudocholinesterase</b> ทำให้ยาถูกสลายช้ามาก เกิด prolonged apnea หลายชั่วโมงหลังได้ยาครั้งเดียว · การจัดการคือ<b>ช่วยหายใจต่อและให้ยาระงับความรู้สึกจนกว่ายาจะหมดฤทธิ์</b> ไม่มียาแก้จำเพาะ และควรตรวจ dibucaine number ยืนยันภายหลัง"},
+ {t:"vent",stem:"ผู้ป่วยสงสัยวัณโรคมาผ่าตัดฉุกเฉิน มาตรการใดเหมาะสมที่สุดในการป้องกันการปนเปื้อนวงจรดมยา",
+  opts:["ติดตั้ง bacterial/viral filter ระหว่างท่อช่วยหายใจกับวงจร","ไม่ต้องใช้ filter หากใช้ระบบปิด","เพิ่ม fresh gas flow เป็น 10 ลิตรต่อนาที","ใช้ HME ธรรมดาแทน filter"],ans:0,
+  exp:"ควรติด <b>bacterial/viral (HEPA-type) filter ระหว่างท่อช่วยหายใจกับวงจร</b> เพื่อดักเชื้อไม่ให้ปนเปื้อนเครื่องและสิ่งแวดล้อม ร่วมกับจัดห้องความดันลบ · HME ธรรมดาไม่รับประกันการกรองเชื้อระดับ HEPA"},
+ {t:"op",stem:"Meperidine เมื่อใช้ร่วมกับยากลุ่มใดเสี่ยงเกิด serotonin syndrome รุนแรง",
+  opts:["Beta-blocker","Loop diuretic","MAOI","Calcium channel blocker"],ans:2,
+  exp:"Meperidine มีฤทธิ์ serotonergic เมื่อใช้ร่วมกับ <b>MAOI</b> (หรือ SSRI/SNRI) เสี่ยง <b>serotonin syndrome</b> — ไข้สูง เกร็ง กระตุก สับสน ความดันแกว่ง — ซึ่งอาจถึงแก่ชีวิต จึงเป็นข้อห้ามสำคัญ"},
+ {t:"vol",stem:"ยาดมสลบชนิดสูดดมมีผลต่อยาหย่อนกล้ามเนื้อกลุ่ม non-depolarizing อย่างไร",
+  opts:["ต้านฤทธิ์ ทำให้ออกฤทธิ์สั้นลง","ไม่มีผลต่อระยะเวลาการออกฤทธิ์","เสริมฤทธิ์ ทำให้ออกฤทธิ์นานขึ้น","เสริมฤทธิ์เฉพาะกลุ่ม depolarizing"],ans:2,
+  exp:"Volatile agent <b>เสริมฤทธิ์ยาหย่อนกล้ามเนื้อกลุ่ม non-depolarizing</b> (desflurane และ sevoflurane เสริมมากกว่า isoflurane) จึงลดขนาดยาที่ต้องใช้และทำให้ฤทธิ์ยาวนานขึ้น · ต้องเฝ้าระวัง residual blockade เมื่อจบการผ่าตัด"},
+ {t:"ind",stem:"ยานำสลบชนิดใดกดการหายใจน้อยที่สุดเมื่อใช้ในขนาดนำสลบ",
+  opts:["Midazolam","Ketamine","Thiopental","Propofol"],ans:1,
+  exp:"<b>Ketamine</b> คงการหายใจเองและ airway reflex ไว้ได้ดีที่สุด · propofol กดการหายใจมากที่สุดจนมักเกิด apnea ตามด้วย thiopental และ midazolam โดยเฉพาะเมื่อให้ร่วมกับ opioid"},
+ {t:"nmb",stem:"Magnesium sulfate มีผลต่อยาหย่อนกล้ามเนื้ออย่างไร",
+  opts:["ต้านฤทธิ์กลุ่ม non-depolarizing จึงต้องเพิ่มขนาดยา","ไม่มีผลต่อยาหย่อนกล้ามเนื้อทุกกลุ่ม","เสริมฤทธิ์กลุ่ม non-depolarizing จึงควรลดขนาดยา","เสริมฤทธิ์เฉพาะกลุ่ม depolarizing เท่านั้น"],ans:2,
+  exp:"Magnesium ยับยั้งการหลั่ง acetylcholine ที่ presynaptic และลดความไวของ motor endplate จึง<b>เสริมฤทธิ์ non-depolarizing อย่างมาก</b> · ในผู้ป่วย severe preeclampsia ที่ได้ MgSO₄ ต้องลดขนาดยาและติดตามด้วย nerve stimulator อย่างใกล้ชิด"},
+ {t:"vent",stem:"Heat and moisture exchanger มีข้อควรระวังในการใช้อย่างไร",
+  opts:["เพิ่ม dead space และความต้านทานของวงจร","ลดความเข้มข้นของออกซิเจนที่ผู้ป่วยได้รับ","ทำให้ค่า ETCO₂ อ่านได้ต่ำกว่าความเป็นจริง","ทำให้ absorbent หมดสภาพเร็วขึ้น"],ans:0,
+  exp:"HME ดักความร้อนและความชื้นจากลมหายใจออกเพื่อคืนให้ลมหายใจเข้า ป้องกันทางเดินหายใจแห้ง · <b>ข้อควรระวังคือเพิ่ม dead space และความต้านทาน</b> โดยเฉพาะในเด็กเล็กและผู้ป่วยที่ tidal volume ต่ำ และหากชื้นจนอุดตันจะเพิ่มแรงต้านมาก"},
+ {t:"op",stem:"opioid ชนิดใดนิยมใช้ระงับอาการหนาวสั่นหลังผ่าตัดผ่าน kappa receptor",
+  opts:["Meperidine","Morphine","Fentanyl","Remifentanil"],ans:0,
+  exp:"<b>Meperidine</b> มีฤทธิ์ต่อ kappa receptor เด่น จึงลด postoperative shivering ได้ดีในขนาดต่ำ (12.5–25 mg IV) · แต่ต้องระวัง normeperidine สะสมในผู้ป่วยไตวายและอันตรกิริยากับ MAOI"},
+ {t:"vol",stem:"ผู้ป่วยที่มีประวัติ malignant hyperthermia ในครอบครัว ยาใดใช้ได้อย่างปลอดภัย",
+  opts:["Succinylcholine","Sevoflurane","Nitrous oxide","Desflurane"],ans:2,
+  exp:"<b>N₂O ไม่ใช่ triggering agent</b> จึงใช้ได้อย่างปลอดภัย เช่นเดียวกับ propofol, opioid, ยาชากลุ่ม amide, ketamine และยาหย่อนกล้ามเนื้อกลุ่ม non-depolarizing · ส่วน<b>ยาดมสลบชนิดระเหยทุกตัวและ succinylcholine เป็น trigger</b>"},
+ {t:"ind",stem:"หญิงตั้งครรภ์ครบกำหนดเป็นโรคหอบหืด ความดัน 170/100 mmHg มาผ่าตัดคลอดฉุกเฉิน ควรเลือกยานำสลบชนิดใด",
+  opts:["Etomidate","Ketamine","Propofol","Thiopental"],ans:2,
+  exp:"<b>Propofol</b> ตอบโจทย์ทั้งสองปัญหา — มีฤทธิ์ขยายหลอดลมและลดการตอบสนองความดันต่อการใส่ท่อช่วยหายใจ · <b>ketamine ห้ามใช้</b>เพราะเพิ่มความดัน, thiopental กระตุ้น histamine เสี่ยง bronchospasm, etomidate ไม่ช่วยควบคุมความดัน"},
+ {t:"nmb",stem:"ผู้ป่วยเพิ่งได้รับ neostigmine แล้วเกิดทางเดินหายใจอุดกั้นจนต้องใส่ท่อช่วยหายใจซ้ำ หากให้ succinylcholine จะเกิดผลอย่างไร",
+  opts:["เกิดภาวะดื้อต่อยา succinylcholine","ยา succinylcholine จะไม่ออกฤทธิ์เลย","Succinylcholine จะออกฤทธิ์นานขึ้นกว่าปกติ","Succinylcholine จะออกฤทธิ์สั้นลงกว่าปกติ"],ans:2,
+  exp:"Neostigmine ยับยั้ง <b>plasma cholinesterase</b> ซึ่งเป็นเอนไซม์ที่สลาย succinylcholine ด้วย ยาจึงถูกทำลายช้าลงและ<b>ออกฤทธิ์นานขึ้นอย่างมาก</b> · ต้องเตรียมช่วยหายใจต่อเนื่องจนกว่ายาจะหมดฤทธิ์"}
+]},
+
+{title:"ชุดที่ 5",qs:[
+ {t:"vent",stem:"ข้อใดผิดเกี่ยวกับ oxygen flush valve",
+  opts:["ส่งออกซิเจน 100% เข้า common gas outlet ด้วยอัตรา 35–75 ลิตรต่อนาที","ใช้เติมถุงลมที่แฟบหรือให้ออกซิเจนในภาวะเร่งด่วน","ใช้กดค้างระหว่างช่วยหายใจตามปกติได้โดยไม่มีความเสี่ยง","การกดขณะต่อกับผู้ป่วยเสี่ยงต่อ barotrauma และการเจือจางยาดมสลบ"],ans:2,
+  exp:"ข้อที่ผิดคือการกดค้างระหว่างช่วยหายใจตามปกติ · flush ส่งออกซิเจนอัตราสูงมากและ<b>บายพาส vaporizer</b> จึงเจือจางยาดมสลบเสี่ยง awareness และหากกดขณะวงจรต่อกับผู้ป่วยในจังหวะหายใจเข้าจะเสี่ยง <b>barotrauma</b>"},
+ {t:"op",stem:"ข้อใดถูกต้องเมื่อเปรียบเทียบ neuraxial morphine กับ neuraxial fentanyl",
+  opts:["Fentanyl กระจายตัวขึ้นสูงมากกว่าเพราะเป็น hydrophilic","Morphine ออกฤทธิ์เร็วกว่าและมี duration สั้นกว่า","Morphine กระจายตัวขึ้นสูงมากกว่าและเสี่ยงกดการหายใจแบบล่าช้า","Fentanyl มี duration ยาวกว่าและกดการหายใจล่าช้ากว่า"],ans:2,
+  exp:"Morphine เป็น <b>hydrophilic</b> จึงอยู่ใน CSF นานและกระจายขึ้นสูง (rostral spread) → ออกฤทธิ์ช้า duration ยาว และเสี่ยง <b>delayed respiratory depression 6–24 ชั่วโมง</b> · fentanyl เป็น lipophilic ออกฤทธิ์เร็ว duration สั้น กดหายใจแบบ early"},
+ {t:"vol",stem:"ยาดมสลบชนิดสูดดมมีผลต่อรูปแบบการหายใจในผู้ป่วยที่หายใจเองอย่างไร",
+  opts:["Tidal volume ลดลง อัตราการหายใจเพิ่มขึ้น","Tidal volume เพิ่มขึ้น อัตราการหายใจลดลง","Tidal volume ลดลง อัตราการหายใจลดลง","Tidal volume เพิ่มขึ้น อัตราการหายใจเพิ่มขึ้น"],ans:0,
+  exp:"ยาดมสลบทำให้การหายใจ<b>ตื้นแต่เร็ว (TV ลด, RR เพิ่ม)</b> ผลรวมคือ minute ventilation ลดลงและ PaCO₂ สูงขึ้น · อีกทั้งยังกด ventilatory response ต่อ CO₂ และภาวะพร่องออกซิเจน จึงต้องเฝ้าระวังการหายใจอย่างใกล้ชิด"},
+ {t:"ind",stem:"ผู้ป่วยได้รับ thiopental ขนาดนำสลบครั้งเดียวแล้วตื่นภายในไม่กี่นาที เกิดจากกลไกใด",
+  opts:["Redistribution ของยาไปยังกล้ามเนื้อและไขมัน","การขับยาออกทางไตอย่างรวดเร็ว","การเปลี่ยนแปลงยาที่ตับอย่างรวดเร็ว","การสลายยาด้วย plasma esterase"],ans:0,
+  exp:"การตื่นเร็วหลังได้ยาครั้งเดียวเกิดจาก <b>redistribution</b> จากสมองไปยังกล้ามเนื้อและไขมัน ไม่ใช่การกำจัดยาออกจากร่างกาย · thiopental มี elimination half-life ยาวถึง ~11 ชั่วโมง จึงสะสมและทำให้ตื่นช้าเมื่อให้ซ้ำหลายครั้ง"},
+ {t:"nmb",stem:"การกระตุ้นแบบ post-tetanic count ใช้ประเมินสิ่งใด",
+  opts:["ระดับ block ที่ลึกจนไม่มีการตอบสนองต่อ train-of-four","ระดับ block ที่ใกล้ฟื้นตัวเต็มที่แล้ว","ความแรงของยาหย่อนกล้ามเนื้อที่ใช้","ความเพียงพอของการให้ยาแก้ฤทธิ์"],ans:0,
+  exp:"<b>PTC ใช้เมื่อ block ลึกมากจน TOF count เป็นศูนย์</b> โดยกระตุ้นแบบ tetanus แล้วนับ twitch ที่ตามมา ยิ่งนับได้น้อยยิ่ง block ลึก (PTC 1–2 = deep block) · เมื่อเริ่มฟื้นตัวจะใช้ TOF count และ TOF ratio ประเมินแทน"},
+ {t:"vent",stem:"ผู้ป่วยทำ low flow anesthesia 3 ชั่วโมง พบ inspired CO₂ สูงขึ้นเรื่อย ๆ โดย leak test ปกติ ควรจัดการอย่างไร",
+  opts:["ให้ dantrolene เพราะสงสัย malignant hyperthermia","เพิ่ม fresh gas flow ชั่วคราวและเปลี่ยน CO₂ absorbent","ลด fresh gas flow ลงอีกเพื่อสงวนแก๊ส","เพิ่มอัตราการหายใจเพียงอย่างเดียว"],ans:1,
+  exp:"ภาพนี้คือ <b>CO₂ absorbent หมดสภาพจากการทำ low flow นาน</b> ทำให้เกิด rebreathing (inspired CO₂ สูง) · แก้เฉพาะหน้าด้วยการ<b>เพิ่ม FGF เป็น high flow เพื่อไล่ CO₂</b> แล้วเปลี่ยน absorbent · หากเป็น MH จะพบ ETCO₂ พุ่งพร้อมอุณหภูมิสูงและชีพจรเร็ว"},
+ {t:"op",stem:"ผู้ป่วยที่เป็น ultrarapid metabolizer ของ CYP2D6 เมื่อได้รับ codeine เสี่ยงต่อภาวะใด",
+  opts:["ไม่ได้ผลระงับปวดเลย","ได้รับ morphine เกินขนาด","เกิดภาวะ methemoglobinemia","เกิดอาการชักจาก metabolite"],ans:1,
+  exp:"Ultrarapid metabolizer เปลี่ยน codeine เป็น morphine ได้เร็วและมากผิดปกติ → <b>ระดับ morphine สูงจนเกิดภาวะเกินขนาด</b> (กดการหายใจ ซึม) · อันตรายเป็นพิเศษในเด็กและมารดาที่ให้นมบุตร จึงหลีกเลี่ยง codeine ในกลุ่มเสี่ยง"},
+ {t:"vol",stem:"ค่า MAC ของยาดมสลบสูงที่สุดในผู้ป่วยกลุ่มอายุใด",
+  opts:["ทารกแรกเกิด","ทารกอายุ 3–6 เดือน","เด็กอายุ 5 ปี","วัยรุ่นอายุ 15 ปี"],ans:1,
+  exp:"MAC สูงสุดที่ช่วง<b>ทารกอายุประมาณ 3–6 เดือน</b> แล้วค่อย ๆ ลดลงตามอายุ · ข้อที่มักเข้าใจผิดคือทารกแรกเกิดซึ่งมี MAC <b>ต่ำกว่า</b> ทารก 3–6 เดือน โดยเฉพาะทารกคลอดก่อนกำหนดที่มี MAC ต่ำกว่าทารกครบกำหนด"},
+ {t:"ind",stem:"หญิง 45 กิโลกรัม มาผ่าตัดฉุกเฉินและมีภาวะอ้วนมาก ข้อใดคือการเลือกน้ำหนักคำนวณยาที่ถูกต้อง",
+  opts:["Succinylcholine คำนวณจาก ideal body weight","Propofol maintenance คำนวณจาก ideal body weight","Rocuronium คำนวณจาก total body weight","Propofol induction คำนวณจาก lean body weight"],ans:3,
+  exp:"<b>Propofol induction ใช้ lean body weight</b> เพื่อป้องกันการได้ยาเกินขนาดและความดันตก · <b>succinylcholine ใช้ total body weight</b> (pseudocholinesterase และ ECF เพิ่มตามน้ำหนักจริง), rocuronium ใช้ ideal body weight และ propofol maintenance ใช้ adjusted body weight"},
+ {t:"nmb",stem:"ขนาดของ sugammadex สำหรับแก้ฤทธิ์ในระดับ moderate block ที่มี TOF count ตั้งแต่ 2 ขึ้นไปคือข้อใด",
+  opts:["2 mg/kg","4 mg/kg","8 mg/kg","16 mg/kg"],ans:0,
+  exp:"ขนาดตามความลึกของ block: <b>moderate block (TOF count ≥ 2) = 2 mg/kg</b>, deep block (PTC 1–2 ยังไม่มี TOF response) = 4 mg/kg และ <b>immediate reversal</b> หลังให้ rocuronium 1.2 mg/kg ทันที = 16 mg/kg"},
+ {t:"vent",stem:"ข้อใดถูกต้องที่สุดเกี่ยวกับขอบเขตของ fail-safe valve",
+  opts:["ป้องกันการจ่าย hypoxic mixture ได้ในทุกกรณี","อาศัยความดันออกซิเจน จึงไม่ป้องกันหากตั้ง flowmeter ออกซิเจนต่ำเอง","วัดความเข้มข้นออกซิเจนที่ถึงผู้ป่วยได้โดยตรง","ทำหน้าที่เดียวกับ pin index safety system"],ans:1,
+  exp:"<b>Fail-safe อาศัย 'ความดัน' ออกซิเจน</b> — หากความดันปกติแต่ผู้ใช้ตั้ง flowmeter ออกซิเจนต่ำเอง ก็ยังจ่าย hypoxic mixture ได้ · การกันสัดส่วนต้องใช้ hypoxic guard/proportioning system และยืนยันด้วย <b>oxygen analyzer</b> ซึ่งเป็นด่านสุดท้าย"},
+ {t:"op",stem:"ข้อใดถูกต้องเกี่ยวกับการตั้งค่าเครื่อง patient-controlled analgesia",
+  opts:["การตั้ง basal infusion ใน IV-PCA เพิ่มความปลอดภัยในผู้ป่วยทั่วไป","Lock-out interval ควรตั้งให้สั้นกว่า peak onset ของยา","Lock-out interval สัมพันธ์กับ peak onset ของยาและเป็นกลไกความปลอดภัยหลัก","PCEA จำเป็นต้องตั้ง basal rate ในผู้ป่วยทุกราย"],ans:2,
+  exp:"<b>Lock-out interval</b> ตั้งให้สอดคล้องกับ peak onset ของยา เพื่อไม่ให้ผู้ป่วยกดยาซ้ำก่อนยาออกฤทธิ์เต็มที่ จึงเป็นกลไกความปลอดภัยหลัก · <b>basal infusion ใน IV-PCA ไม่เพิ่มความปลอดภัย</b> แต่เพิ่มความเสี่ยงกดการหายใจ"},
+ {t:"vol",stem:"เช้าวันจันทร์พบผู้ป่วยรายแรกมีระดับ carboxyhemoglobin สูงผิดปกติ หลังเครื่องดมยาถูกเปิด fresh gas flow ค้างไว้ตลอดสุดสัปดาห์ สาเหตุคือข้อใด",
+  opts:["การรั่วของแก๊สจากระบบ scavenging","ปฏิกิริยาระหว่างยาดมสลบกับ CO₂ absorbent ที่แห้ง","การสลายตัวของยาดมสลบด้วยความร้อนจาก vaporizer","การปนเปื้อนของแก๊สอื่นในระบบ pipeline"],ans:1,
+  exp:"CO₂ absorbent ที่<b>แห้ง</b>จากการเปิด FGF ค้างไว้นาน ทำปฏิกิริยากับยาที่มีหมู่ CHF₂ (<b>desflurane &gt; enflurane &gt; isoflurane</b>) เกิด <b>carbon monoxide</b> · ส่วน sevoflurane กับ absorbent แห้งจะเกิด Compound A และความร้อนสูง"},
+ {t:"ind",stem:"เด็ก 4 ปี ทำ inhalation induction ผ่านไป 60 วินาที หายใจเร็ว 40 ครั้งต่อนาที SpO₂ 98% เกิดจากสาเหตุใด",
+  opts:["ภาวะพร่องออกซิเจน","ระดับยาสลบยังไม่ลึกพอ","ภาวะคาร์บอนไดออกไซด์คั่ง","ภาวะ malignant hyperthermia"],ans:1,
+  exp:"ในช่วงต้นของ inhalation induction ผู้ป่วยอยู่ใน <b>stage 2 (excitement)</b> ซึ่งมีการหายใจไม่สม่ำเสมอ เร็วขึ้น กลืนน้ำลาย และเคลื่อนไหว · SpO₂ 98% ตัดภาวะพร่องออกซิเจนออกได้ · แก้ด้วยการเพิ่มความลึกของการสลบและหลีกเลี่ยงการกระตุ้น"},
+ {t:"nmb",stem:"ข้อใดพบได้จากยาหย่อนกล้ามเนื้อกลุ่ม depolarizing เมื่อให้ซ้ำหลายครั้ง",
+  opts:["การเกิด fade ในการกระตุ้นแบบ train-of-four","การเกิด post-tetanic facilitation ตั้งแต่เริ่มให้ยา","การตอบสนองที่คงที่ตลอดโดยไม่เปลี่ยนแปลง","การแก้ฤทธิ์ได้ด้วย neostigmine ตั้งแต่ครั้งแรก"],ans:0,
+  exp:"Phase 1 block ไม่มี fade และ neostigmine ทำให้ block นานขึ้น · แต่เมื่อให้ยาซ้ำหรือขนาดสูง (&gt;3–5 mg/kg) จะเปลี่ยนเป็น <b>phase 2 block</b> ซึ่งมีลักษณะคล้าย non-depolarizing คือ<b>เกิด fade</b> ในการกระตุ้นแบบ TOF"},
+ {t:"vent",stem:"เมื่อนำ variable-bypass vaporizer ไปใช้ในพื้นที่สูง จะเกิดผลอย่างไร",
+  opts:["ความเข้มข้นเชิงปริมาตรลดลงและ partial pressure ลดลงตามกัน","ความเข้มข้นเชิงปริมาตรสูงขึ้น แต่ partial pressure ใกล้เคียงค่าที่ตั้ง","ความเข้มข้นเชิงปริมาตรและ partial pressure สูงขึ้นทั้งคู่","ความเข้มข้นเชิงปริมาตรและ partial pressure ไม่เปลี่ยนแปลง"],ans:1,
+  exp:"ที่ความดันบรรยากาศต่ำ vaporizer จะจ่ายยาที่<b>เปอร์เซ็นต์ปริมาตรสูงขึ้น แต่ partial pressure ซึ่งเป็นตัวกำหนดฤทธิ์จริงใกล้เคียงค่าที่ตั้งไว้</b> จึงไม่ต้องปรับ dial · ยกเว้น desflurane vaporizer ที่ควบคุมความดันโดยตรง ต้องปรับเพิ่มเมื่ออยู่ที่สูง"},
+ {t:"op",stem:"ข้อใดถูกต้องเกี่ยวกับ remifentanil",
+  opts:["ต้องปรับขนาดยาในผู้ป่วยไตวายระยะสุดท้าย","CSHT เพิ่มขึ้นตามระยะเวลาการให้ยาอย่างชัดเจน","เสี่ยงเกิด acute tolerance และ hyperalgesia หลังหยุดยา","มี metabolite ที่ออกฤทธิ์และสะสมในตับ"],ans:2,
+  exp:"Remifentanil สลายด้วย nonspecific esterase จึงไม่ต้องปรับขนาดในตับหรือไตวาย และมี CSHT สั้นคงที่แม้ให้ยานาน · <b>จุดที่ต้องระวังคือ acute opioid tolerance และ hyperalgesia หลังหยุดยา</b> จึงต้องวางแผนให้ยาระงับปวดออกฤทธิ์ยาวล่วงหน้า"},
+ {t:"vol",stem:"ยาดมสลบชนิดใดเมื่อสัมผัส CO₂ absorbent ที่แห้งมากแล้วเสี่ยงเกิด Compound A มากที่สุด",
+  opts:["Sevoflurane","Nitrous oxide","Halothane","Isoflurane"],ans:0,
+  exp:"<b>Sevoflurane กับ absorbent ที่แห้ง</b> (โดยเฉพาะ Baralyme เก่า) เกิด <b>Compound A</b> ซึ่งมีพิษต่อไตในสัตว์ทดลอง พร้อมความร้อนสูง · ส่วน desflurane, enflurane และ isoflurane กับ absorbent แห้งจะเกิด carbon monoxide"},
+ {t:"ind",stem:"ผู้ป่วยที่มีภาวะ hypovolemia ร่วมกับ adrenal insufficiency ควรเลือกยานำสลบชนิดใด",
+  opts:["Thiopental","Ketamine","Propofol","Etomidate"],ans:1,
+  exp:"<b>Ketamine</b> กระตุ้น sympathetic ช่วยพยุงความดันในผู้ป่วย hypovolemia และไม่กดต่อมหมวกไต · <b>etomidate ต้องหลีกเลี่ยง</b>ในผู้ป่วยกลุ่มนี้เพราะยิ่งกดการสร้าง cortisol ซ้ำเติมภาวะที่เป็นอยู่ ส่วน propofol และ thiopental ทำให้ความดันตก"},
+ {t:"nmb",stem:"ยาปฏิชีวนะกลุ่มใดเสริมฤทธิ์ยาหย่อนกล้ามเนื้อได้มากที่สุด",
+  opts:["Penicillin","Cephalosporin","Metronidazole","Aminoglycoside"],ans:3,
+  exp:"<b>Aminoglycoside</b> (gentamicin, amikacin) ยับยั้งการหลั่ง acetylcholine ที่ presynaptic โดยรบกวนการเข้าของแคลเซียม จึงเสริมฤทธิ์ยาหย่อนกล้ามเนื้อและทำให้เกิด residual paralysis · กลุ่มอื่นที่มีผลคล้ายกันคือ polymyxin, clindamycin และ tetracycline"}
+]}
+];
+
+const ANSKEY=[3,3,3,1,2,1,1,3,0,0,2,2,1,1,0,3,3,2,2,1,0,3,0,2,1,1,0,3,0,1,3,3,3,0,0,0,2,3,1,3,2,2,3,0,0,0,1,2,1,2,3,3,0,2,0,2,2,1,2,1,3,1,3,0,0,2,2,1,1,0,2,0,3,3,0,2,1,2,3,0,3,1,0,1,1,3,3,1,0,1,2,1,2,0,2,1,3,0,2,2];
+let answered=0, correct=0, totalQ=0;
+const KEYS=["ก","ข","ค","ง"];
+const stats={};
+Object.keys(TOPICS).forEach(k=>stats[k]={n:0,ok:0,total:0});
+
+const quiz=document.getElementById("quiz");
+let counter=0;
+
+BLOCKS.forEach((blk,bi)=>{
+  const head=document.createElement("div");
+  head.className="block-head";
+  const from=counter+1, to=counter+blk.qs.length;
+  head.innerHTML=`<span class="no">0${bi+1}</span><h2>${blk.title}</h2><span class="rng">ข้อ ${from}–${to}</span>`;
+  quiz.appendChild(head);
+
+  blk.qs.forEach((q)=>{
+    counter++; totalQ++;
+    stats[q.t].total++;
+    const n=counter;
+    // rotate options so the answer key is evenly distributed across ก-ง
+    const shift=((ANSKEY[n-1]-q.ans)%4+4)%4;
+    if(shift){
+      const ro=new Array(4);
+      for(let i=0;i<4;i++) ro[(i+shift)%4]=q.opts[i];
+      q.opts=ro; q.ans=ANSKEY[n-1];
+    }
+    const tp=TOPICS[q.t];
+    const card=document.createElement("div");
+    card.className="q";
+    const calcHtml=q.calc?`<div class="calc">${q.calc}</div>`:"";
+    card.innerHTML=`
+      <div class="q-top">
+        <span class="qno">Q${n}</span>
+        <span class="pill" style="background:${tp.color}">${tp.label}</span>
+        <div class="stem">${q.stem}</div>
+      </div>
+      <ul class="opts" data-ans="${q.ans}"></ul>
+      <div class="explain"><span class="tag">เฉลย · คำอธิบาย</span><div class="etext"></div>${calcHtml}</div>`;
+    const ul=card.querySelector(".opts");
+    q.opts.forEach((o,oi)=>{
+      const li=document.createElement("li");
+      li.className="opt";
+      li.innerHTML=`<span class="k">${KEYS[oi]}.</span><span>${o}</span>`;
+      li.addEventListener("click",()=>choose(card,ul,oi,q));
+      ul.appendChild(li);
+    });
+    card.querySelector(".etext").innerHTML=q.exp;
+    quiz.appendChild(card);
+  });
+});
+document.getElementById("total").textContent=totalQ;
+
+function choose(card,ul,oi,q){
+  if(ul.dataset.done)return;
+  ul.dataset.done="1";
+  [...ul.children].forEach((li,i)=>{
+    li.classList.add("locked");
+    if(i===q.ans)li.classList.add("correct");
+    else if(i===oi)li.classList.add("wrong");
+    else li.classList.add("dim");
+  });
+  card.querySelector(".explain").classList.add("show");
+  answered++; stats[q.t].n++;
+  if(oi===q.ans){correct++; stats[q.t].ok++;}
+  updateScore();
+}
+
+function updateScore(){
+  document.getElementById("score").textContent=correct;
+  document.getElementById("answered").textContent=answered;
+  document.getElementById("fill").style.width=(answered/totalQ*100)+"%";
+  renderBreakdown();
+  const btn=document.getElementById("submitBtn");
+  if(btn) btn.disabled = (answered!==totalQ);
+}
+
+function renderBreakdown(){
+  const box=document.getElementById("breakdown");
+  box.innerHTML="";
+  Object.keys(TOPICS).forEach(k=>{
+    const s=stats[k], tp=TOPICS[k];
+    const pct = s.n ? Math.round(s.ok/s.n*100) : 0;
+    const row=document.createElement("div");
+    row.className="trow";
+    row.innerHTML=`<span class="nm">${tp.name}</span>
+      <span class="tb"><i style="width:${pct}%;background:${tp.color}"></i></span>
+      <span class="sc">${s.ok}/${s.n||0}</span>`;
+    box.appendChild(row);
+  });
+}
+renderBreakdown();
+
+function buildPayload(){
+  return {
+    name:(document.getElementById("takerName").value||"").trim(),
+    score:correct, total:totalQ,
+    vent:`${stats.vent.ok}/${stats.vent.n}`,
+    op:`${stats.op.ok}/${stats.op.n}`,
+    vol:`${stats.vol.ok}/${stats.vol.n}`,
+    ind:`${stats.ind.ok}/${stats.ind.n}`,
+    nmb:`${stats.nmb.ok}/${stats.nmb.n}`
+  };
+}
+function resultText(){
+  const p=buildPayload();
+  return `ชื่อ: ${p.name||"(ไม่ระบุ)"}\nคะแนนรวม: ${p.score}/${p.total}\n`+
+    `Ventilator: ${p.vent} · Opioid: ${p.op} · Volatile: ${p.vol} · Induction: ${p.ind} · NMB: ${p.nmb}`;
+}
+function setStatus(msg,cls){
+  const el=document.getElementById("submitStatus");
+  el.textContent=msg; el.className="submitstatus"+(cls?(" "+cls):"");
+}
+function submitScore(){
+  if(answered!==totalQ){ setStatus("กรุณาตอบให้ครบทั้ง 100 ข้อก่อนส่ง","err"); return; }
+  const p=buildPayload();
+  if(!p.name){ setStatus("กรุณากรอกชื่อก่อนส่งคะแนน","err"); return; }
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0){
+    setStatus("ยังไม่ได้ตั้งค่าลิงก์ระบบเก็บคะแนน — ใช้ปุ่ม “คัดลอกผล” ส่งให้ผู้จัดสอบแทนได้","err"); return;
+  }
+  setStatus("กำลังส่ง…");
+  const btn=document.getElementById("submitBtn"); btn.disabled=true;
+  fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(p)})
+  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓ ขอบคุณค่ะ","ok"); })
+  .catch(()=>{ btn.disabled=false; setStatus("ส่งไม่สำเร็จ ลองใหม่ หรือใช้ปุ่ม “คัดลอกผล”","err"); });
+}
+function copyResult(){
+  const txt=resultText();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>setStatus("คัดลอกผลแล้ว — วางส่งให้ผู้จัดสอบได้เลย","ok"))
+      .catch(()=>fallbackCopy(txt));
+  } else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand("copy"); setStatus("คัดลอกผลแล้ว","ok");}catch(e){setStatus("คัดลอกไม่สำเร็จ","err");}
+  document.body.removeChild(ta);
+}
+
+function resetQuiz(){
+  answered=0;correct=0;
+  Object.keys(stats).forEach(k=>{stats[k].n=0;stats[k].ok=0;});
+  document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
+  document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));
+  setStatus("");
+  updateScore();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>
