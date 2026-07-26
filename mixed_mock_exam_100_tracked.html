@@ -161,15 +161,15 @@
   </div>
 
   <div class="submitcard">
-    <h3>ส่งคะแนนให้ผู้จัดสอบ</h3>
-    <p class="sub">กรอกชื่อ แล้วกดส่งเมื่อทำครบทุกข้อ — คะแนนจะถูกบันทึกเข้าระบบของผู้จัดสอบ</p>
+    <h3>คะแนนจะถูกบันทึกอัตโนมัติ</h3>
+    <p class="sub">เมื่อตอบครบทั้ง 100 ข้อ ระบบจะส่งคะแนนเข้า Dashboard ให้เองโดยไม่ต้องกรอกชื่อ — ใส่ชื่อด้านล่างก่อนทำข้อสอบเสร็จหากอยากให้ปรากฏใน Dashboard</p>
     <div class="namerow">
-      <input id="takerName" type="text" placeholder="ชื่อ–นามสกุล ของผู้ทำ" maxlength="60" autocomplete="name">
-      <button id="submitBtn" class="btn" onclick="submitScore()" disabled>ส่งคะแนน</button>
+      <input id="takerName" type="text" placeholder="ชื่อ–นามสกุล (ไม่บังคับ)" maxlength="60" autocomplete="name">
+      <button id="submitBtn" class="btn" onclick="submitScore()" disabled>ส่งคะแนนอีกครั้ง</button>
       <button class="btn ghost" onclick="copyResult()">คัดลอกผล</button>
     </div>
     <div id="submitStatus" class="submitstatus"></div>
-    <p class="submitnote">ปุ่ม “ส่งคะแนน” จะเปิดใช้งานเมื่อตอบครบทั้ง 100 ข้อ · ถ้าส่งเข้าระบบไม่ได้ ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้</p>
+    <p class="submitnote">คะแนนจะถูกส่งเองทันทีที่ตอบครบ 100 ข้อ · ปุ่ม “ส่งคะแนนอีกครั้ง” ไว้ใช้กรณีต้องการส่งซ้ำ (เช่น เปลี่ยนชื่อทีหลัง) · ถ้าส่งเข้าระบบไม่ได้ ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้</p>
   </div>
 </div>
 
@@ -514,6 +514,7 @@ const BLOCKS=[
 
 const ANSKEY=[3,3,3,1,2,1,1,3,0,0,2,2,1,1,0,3,3,2,2,1,0,3,0,2,1,1,0,3,0,1,3,3,3,0,0,0,2,3,1,3,2,2,3,0,0,0,1,2,1,2,3,3,0,2,0,2,2,1,2,1,3,1,3,0,0,2,2,1,1,0,2,0,3,3,0,2,1,2,3,0,3,1,0,1,1,3,3,1,0,1,2,1,2,0,2,1,3,0,2,2];
 let answered=0, correct=0, totalQ=0;
+let autoSubmitted=false;
 const KEYS=["ก","ข","ค","ง"];
 const stats={};
 Object.keys(TOPICS).forEach(k=>stats[k]={n:0,ok:0,total:0});
@@ -587,6 +588,10 @@ function updateScore(){
   renderBreakdown();
   const btn=document.getElementById("submitBtn");
   if(btn) btn.disabled = (answered!==totalQ);
+  if(answered===totalQ && !autoSubmitted){
+    autoSubmitted=true;
+    submitScore();
+  }
 }
 
 function renderBreakdown(){
@@ -628,7 +633,6 @@ function setStatus(msg,cls){
 function submitScore(){
   if(answered!==totalQ){ setStatus("กรุณาตอบให้ครบทั้ง 100 ข้อก่อนส่ง","err"); return; }
   const p=buildPayload();
-  if(!p.name){ setStatus("กรุณากรอกชื่อก่อนส่งคะแนน","err"); return; }
   if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0){
     setStatus("ยังไม่ได้ตั้งค่าลิงก์ระบบเก็บคะแนน — ใช้ปุ่ม “คัดลอกผล” ส่งให้ผู้จัดสอบแทนได้","err"); return;
   }
@@ -637,7 +641,7 @@ function submitScore(){
   fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify(p)})
-  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓ ขอบคุณค่ะ","ok"); })
+  .then(()=>{ btn.disabled=false; setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓ ขอบคุณค่ะ","ok"); })
   .catch(()=>{ btn.disabled=false; setStatus("ส่งไม่สำเร็จ ลองใหม่ หรือใช้ปุ่ม “คัดลอกผล”","err"); });
 }
 function copyResult(){
@@ -654,7 +658,7 @@ function fallbackCopy(txt){
 }
 
 function resetQuiz(){
-  answered=0;correct=0;
+  answered=0;correct=0;autoSubmitted=false;
   Object.keys(stats).forEach(k=>{stats[k].n=0;stats[k].ok=0;});
   document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
   document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));
