@@ -623,7 +623,9 @@ renderBreakdown();
 function buildPayload(){
   return {
     name:(document.getElementById("takerName").value||"").trim(),
-    score:correct, total:totalQ,
+    score:correct, total:totalQ, answered:answered,
+    set:"ชุดที่ 1",
+    status: answered===totalQ ? "ครบ" : "ไม่ครบ",
     vent:`${stats.vent.ok}/${stats.vent.n}`,
     op:`${stats.op.ok}/${stats.op.n}`,
     vol:`${stats.vol.ok}/${stats.vol.n}`,
@@ -656,6 +658,16 @@ function submitScore(retry){
     setStatus("ส่งคะแนนอัตโนมัติไม่สำเร็จ — ใช้ปุ่ม “คัดลอกผล” แล้วส่งข้อความให้ผู้จัดสอบแทนได้","err");
   });
 }
+let leftReported=false;
+function reportAbandon(){
+  if(autoSubmitted || leftReported || answered===0) return;
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  leftReported=true;
+  const p=buildPayload();
+  try{ navigator.sendBeacon(SUBMIT_URL, JSON.stringify(p)); }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") reportAbandon(); });
+window.addEventListener("pagehide", reportAbandon);
 function copyResult(){
   const txt=resultText();
   if(navigator.clipboard && navigator.clipboard.writeText){
@@ -670,7 +682,7 @@ function fallbackCopy(txt){
 }
 
 function resetQuiz(){
-  answered=0;correct=0;autoSubmitted=false;
+  answered=0;correct=0;autoSubmitted=false;leftReported=false;
   Object.keys(stats).forEach(k=>{stats[k].n=0;stats[k].ok=0;});
   document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
   document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));

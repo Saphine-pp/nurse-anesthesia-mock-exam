@@ -41,6 +41,7 @@
   .btn.ghost:hover{border-color:var(--slate);color:var(--slate);}
 
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;}
+  .card.warn .val{color:var(--alert);}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
   .card .lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;}
   .card .val{font-size:22px;font-weight:700;color:var(--ink);}
@@ -100,10 +101,11 @@
   </div>
 
   <div class="cards">
-    <div class="card"><p class="lbl">ผู้เข้าสอบ</p><p class="val" id="cCount">–</p></div>
-    <div class="card"><p class="lbl">คะแนนเฉลี่ย</p><p class="val" id="cAvg">–</p><p class="sub">จาก 100 ข้อ</p></div>
+    <div class="card"><p class="lbl">ทำครบ</p><p class="val" id="cCount">–</p></div>
+    <div class="card"><p class="lbl">คะแนนเฉลี่ย</p><p class="val" id="cAvg">–</p><p class="sub">เฉพาะคนที่ทำครบ</p></div>
     <div class="card"><p class="lbl">คะแนนสูงสุด</p><p class="val" id="cMax">–</p></div>
     <div class="card"><p class="lbl">คะแนนต่ำสุด</p><p class="val" id="cMin">–</p></div>
+    <div class="card warn"><p class="lbl">ไม่ครบ / ออกกลางคัน</p><p class="val" id="cIncomplete">–</p></div>
   </div>
 
   <div class="panel">
@@ -119,7 +121,7 @@
       <table>
         <thead>
           <tr>
-            <th>#</th><th>ชื่อ</th><th>คะแนน</th><th>%</th>
+            <th>#</th><th>ชื่อ</th><th>ชุด</th><th>สถานะ</th><th>คะแนน</th><th>%</th>
             <th>Vent</th><th>Opioid</th><th>Volatile</th><th>Induction</th><th>NMB</th>
             <th>เวลาส่ง</th>
           </tr>
@@ -152,6 +154,8 @@ function parseFrac(s){
   return {ok:ok||0,n:n||0};
 }
 
+function isComplete(r){ return !r.status || r.status==="ครบ"; }
+
 function setStatus(msg){document.getElementById("status").textContent=msg;}
 
 async function load(){
@@ -183,7 +187,10 @@ function renderAll(){
 }
 
 function renderCards(){
-  const n=rows.length;
+  const completed=rows.filter(isComplete);
+  const incomplete=rows.filter(r=>!isComplete(r));
+  document.getElementById("cIncomplete").textContent=incomplete.length;
+  const n=completed.length;
   document.getElementById("cCount").textContent=n;
   if(!n){
     document.getElementById("cAvg").textContent="–";
@@ -191,7 +198,7 @@ function renderCards(){
     document.getElementById("cMin").textContent="–";
     return;
   }
-  const scores=rows.map(r=>Number(r.score)||0);
+  const scores=completed.map(r=>Number(r.score)||0);
   const avg=scores.reduce((a,b)=>a+b,0)/n;
   document.getElementById("cAvg").textContent=avg.toFixed(1);
   document.getElementById("cMax").textContent=Math.max(...scores);
@@ -222,22 +229,36 @@ function renderTable(){
   const filtered=rows
     .filter(r=>!q || String(r.name||"").toLowerCase().indexOf(q)>=0)
     .slice()
-    .sort((a,b)=>(Number(b.score)||0)-(Number(a.score)||0));
+    .sort((a,b)=>{
+      const ca=isComplete(a), cb=isComplete(b);
+      if(ca!==cb) return ca? -1:1;
+      return (Number(b.score)||0)-(Number(a.score)||0);
+    });
 
   document.getElementById("emptyMsg").style.display = filtered.length ? "none" : "block";
   if(!filtered.length && rows.length) document.getElementById("emptyMsg").textContent="ไม่พบชื่อที่ค้นหา";
 
-  filtered.forEach((r,i)=>{
+  let rank=0;
+  filtered.forEach((r)=>{
+    const complete=isComplete(r);
     const total=Number(r.total)||100;
+    const answered=Number(r.answered)||total;
     const score=Number(r.score)||0;
-    const pct=Math.round(score/total*100);
-    const pctClass= pct>=70?"high":(pct<50?"low":"");
+    const denom=complete? total : (answered||1);
+    const pct=Math.round(score/denom*100);
+    const pctClass= complete ? (pct>=70?"high":(pct<50?"low":"")) : "";
     const tr=document.createElement("tr");
     const ts=r.timestamp? new Date(r.timestamp).toLocaleString("th-TH",{dateStyle:"short",timeStyle:"short"}) : "-";
+    if(complete) rank++;
+    const statusBadge = complete
+      ? `<span class="badge" style="background:var(--signal)">ครบ</span>`
+      : `<span class="badge" style="background:var(--alert)">ไม่ครบ (${answered}/${total})</span>`;
     tr.innerHTML=`
-      <td class="rank">${i+1}</td>
+      <td class="rank">${complete? rank : "–"}</td>
       <td class="name">${escapeHtml(r.name||"(ไม่ระบุ)")}</td>
-      <td>${score}/${total}</td>
+      <td>${escapeHtml(r.set||"–")}</td>
+      <td>${statusBadge}</td>
+      <td>${score}/${complete? total : answered}</td>
       <td class="pct ${pctClass}">${pct}%</td>
       ${["vent","op","vol","ind","nmb"].map(k=>{
         const f=parseFrac(r[k]);
