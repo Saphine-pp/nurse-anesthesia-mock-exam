@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข้อสอบ Muscle Relaxant — 40 ข้อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF2EE;--panel:#FFFFFF;--ink:#182620;--muted:#566B60;--line:#D4DED7;
+    --moss:#2E6B4E;--moss-soft:#E1EFE6;--signal:#1F9D63;--signal-soft:#E4F4EC;
+    --alert:#C4463A;--alert-soft:#F8E7E5;--ink-panel:#12211A;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px;}
+
+  header.hero{background:var(--ink-panel);color:#E8F2EC;padding:26px 18px 22px;position:relative;overflow:hidden;}
+  .hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#7FC6A0;margin:0 0 8px;}
+  .hero h1{font-size:26px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .hero p{margin:0;color:#A2B8AC;font-size:14px;}
+  .badge-hard{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    background:#1E3A2C;color:#8FD3AC;border:1px solid #3D6B52;border-radius:6px;padding:3px 8px;margin-left:8px;vertical-align:middle;}
+  .tof{position:absolute;left:0;right:0;bottom:0;height:50px;width:100%;z-index:1;opacity:.55;}
+
+  .scorebar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 18px;}
+  .scorebar .inner{max-width:820px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .readout{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);}
+  .readout b{color:var(--moss);font-weight:600;}
+  .bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden;max-width:240px;}
+  .bar span{display:block;height:100%;width:0;background:var(--moss);transition:width .4s ease;}
+  .reset{font-family:"IBM Plex Mono",monospace;font-size:12px;background:none;border:1px solid var(--line);
+    color:var(--muted);padding:5px 10px;border-radius:7px;cursor:pointer;}
+  .reset:hover{border-color:var(--moss);color:var(--moss);}
+
+  .section-head{display:flex;align-items:baseline;gap:12px;margin:38px 0 6px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  .section-head .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--moss);font-weight:600;}
+  .section-head h2{font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .section-note{font-size:13px;color:var(--muted);margin:6px 0 16px;}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;margin:0 0 14px;}
+  .q-top{display:flex;gap:11px;align-items:flex-start;}
+  .qno{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;background:var(--moss-soft);color:var(--moss);
+    padding:3px 8px;border-radius:6px;flex:none;margin-top:2px;}
+  .stem{font-size:15.5px;font-weight:500;}
+  .opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px;}
+  .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+    cursor:pointer;font-size:14.5px;background:#fff;transition:border-color .15s,background .15s;}
+  .opt:hover{border-color:var(--moss);background:#FAFDFB;}
+  .opt .k{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--muted);flex:none;}
+  .opt.correct{background:var(--signal-soft);border-color:var(--signal);}
+  .opt.correct .k{color:var(--signal);}
+  .opt.wrong{background:var(--alert-soft);border-color:var(--alert);}
+  .opt.wrong .k{color:var(--alert);}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:.55;}
+
+  .explain{margin-top:12px;border-left:3px solid var(--moss);background:#F6FAF7;border-radius:0 8px 8px 0;
+    padding:11px 13px;font-size:14px;color:#26362E;display:none;}
+  .explain.show{display:block;}
+  .explain .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--moss);display:block;margin-bottom:4px;}
+  .explain b{color:var(--ink);}
+
+  footer{margin-top:44px;text-align:center;color:var(--muted);font-size:12.5px;}
+  footer .mono{font-size:11px;letter-spacing:.1em;}
+
+  .namecard{margin:16px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .namecard label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 8px;}
+  .namecard input{width:100%;font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);}
+  .namecard input:focus{outline:none;border-color:var(--ink);}
+  .submitstatus{margin-top:10px;font-size:13px;min-height:18px;text-align:center;}
+  .submitstatus.ok{color:var(--signal);}
+  .submitstatus.err{color:var(--alert);}
+
+  @media print{
+    .scorebar,.reset,.tof,.namecard,.submitstatus{display:none!important;}
+    body{background:#fff;}
+    header.hero{background:#fff;color:#000;border-bottom:2px solid #000;}
+    .eyebrow{color:#000;}.hero p{color:#333;}.badge-hard{color:#000;border-color:#000;background:#eee;}
+    .explain{display:block!important;}
+    .opt.correct{outline:2px solid var(--signal);}
+    .q{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Board Prep · Neuromuscular Blocking Agents</p>
+    <h1>ข้อสอบ Muscle Relaxant<span class="badge-hard">40 ข้อ</span></h1>
+    <p>Depolarizing · Non-depolarizing · Reversal · TOF monitoring · แตะเพื่อดูเฉลย</p>
+  </div>
+  <svg class="tof" viewBox="0 0 820 50" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#7FC6A0" stroke-width="2">
+      <path d="M120,46 L120,10"/><path d="M180,46 L180,18"/><path d="M240,46 L240,26"/><path d="M300,46 L300,34"/>
+      <path d="M460,46 L460,12"/><path d="M520,46 L520,20"/><path d="M580,46 L580,28"/><path d="M640,46 L640,36"/>
+      <path d="M0,46 L820,46"/>
+    </g>
+  </svg>
+</header>
+
+<div class="wrap">
+  <div class="namecard">
+    <label for="takerName">ชื่อ–นามสกุล ของผู้ทำ (ไม่บังคับ)</label>
+    <input id="takerName" type="text" placeholder="กรอกชื่อก่อนเริ่มทำข้อสอบ หากอยากให้ปรากฏใน Dashboard" maxlength="60" autocomplete="name">
+  </div>
+</div>
+
+<div class="scorebar">
+  <div class="inner">
+    <span class="readout">SCORE <b id="score">0</b>/<span id="answered">0</span> · <span id="total">40</span> ข้อ</span>
+    <div class="bar"><span id="fill"></span></div>
+    <button class="reset" onclick="resetQuiz()">รีเซ็ต</button>
+  </div>
+</div>
+
+<main class="wrap" id="quiz"></main>
+<div class="wrap"><div id="submitStatus" class="submitstatus"></div></div>
+
+<footer class="wrap">
+  <p>ข้อสอบต้นฉบับ เรียบเรียงแนวจากคลังข้อสอบเก่าในโปรเจกต์ — ใช้เพื่อฝึกทบทวนเท่านั้น</p>
+  <p class="mono">MUSCLE RELAXANT SET · 40 ITEMS · v1</p>
+</footer>
+
+<script>
+const DATA = [
+{
+  sec:"หมวด 1 · Depolarizing (Succinylcholine)",
+  note:"กลไก ผลข้างเคียง ข้อห้าม และลักษณะของ depolarizing block",
+  qs:[
+    {
+      stem:"Succinylcholine ถูกทำให้หมดฤทธิ์โดยกลไกใด",
+      opts:["Acetylcholinesterase ที่ neuromuscular junction","Pseudocholinesterase ในพลาสมา","เอนไซม์ cytochrome P450 ที่ตับ","Hofmann elimination ในกระแสเลือด"],
+      ans:1,
+      exp:"Succinylcholine ถูกสลายโดย <b>pseudocholinesterase (plasma/butyrylcholinesterase)</b> ในกระแสเลือด ก่อนจะไปถึง NMJ ด้วยซ้ำ · ปริมาณยาที่ไปถึง receptor จึงน้อยและออกฤทธิ์สั้นเพียง 5–10 นาที · ผู้ที่มีเอนไซม์ผิดปกติหรือปริมาณน้อยจะออกฤทธิ์นานผิดปกติ"
+    },
+    {
+      stem:"ข้อใดไม่ใช่ผลข้างเคียงของ succinylcholine",
+      opts:["อาการปวดกล้ามเนื้อหลังผ่าตัด","ความดันในลูกตาเพิ่มขึ้น","ความดันในกะโหลกศีรษะเพิ่มขึ้น","ภาวะโพแทสเซียมในเลือดต่ำ"],
+      ans:3,
+      exp:"Succinylcholine ทำให้เกิด <b>hyperkalemia (โพแทสเซียมสูง)</b> ไม่ใช่ต่ำ เพราะการ depolarize ทำให้โพแทสเซียมไหลออกจากเซลล์กล้ามเนื้อ (โดยทั่วไปเพิ่ม ~0.5 mEq/L) · ส่วน myalgia, IOP สูง, ICP สูง, intragastric pressure สูง, bradycardia และ MH trigger ล้วนเป็นผลข้างเคียงจริง"
+    },
+    {
+      stem:"ภาวะหัวใจเต้นช้าจาก succinylcholine เกิดจากกลไกใด",
+      opts:["กระตุ้น dopaminergic receptor ที่ระบบประสาทส่วนกลาง","กระตุ้น vagus nerve ที่ระบบประสาทส่วนกลางโดยตรง","กระตุ้น muscarinic receptor บริเวณ SA node ในหัวใจ","กระตุ้น nicotinic receptor บริเวณ autonomic ganglion"],
+      ans:2,
+      exp:"Succinylcholine มีโครงสร้างคล้าย acetylcholine จึงกระตุ้น <b>muscarinic receptor ที่ SA node</b> โดยตรง ทำให้หัวใจเต้นช้า โดยเฉพาะในเด็กและเมื่อให้ยาซ้ำครั้งที่สอง · ป้องกันด้วย atropine นำก่อนในผู้ป่วยเด็ก"
+    },
+    {
+      stem:"การทำ precurarization ก่อนให้ succinylcholine ไม่สามารถลดภาวะใดได้",
+      opts:["อาการปวดกล้ามเนื้อหลังผ่าตัด","ระดับโพแทสเซียมในเลือดที่สูงขึ้น","ความดันในลูกตาที่เพิ่มขึ้น","ความดันในกะโหลกศีรษะที่เพิ่มขึ้น"],
+      ans:1,
+      exp:"Precurarization (ให้ non-depolarizing ขนาดต่ำนำก่อน ~10% ของ ED95) ลด <b>fasciculation, myalgia, IOP และ ICP</b> ที่เพิ่มขึ้นได้ · แต่ <b>ไม่สามารถป้องกัน hyperkalemia</b> ได้ จึงไม่ทำให้ succinylcholine ปลอดภัยขึ้นในผู้ป่วยที่เสี่ยงต่อโพแทสเซียมสูง"
+    },
+    {
+      stem:"ข้อใดพบได้จากการใช้ยาหย่อนกล้ามเนื้อกลุ่ม depolarizing",
+      opts:["Fade ในการกระตุ้นแบบ train-of-four","การเกิด phase 2 block เมื่อได้ยาซ้ำหลายครั้ง","Post-tetanic facilitation ที่ชัดเจน","การแก้ฤทธิ์ได้ด้วย neostigmine"],
+      ans:1,
+      exp:"Phase 1 block ของ depolarizing จะ <b>ไม่มี fade และไม่มี post-tetanic facilitation</b> และ neostigmine กลับทำให้ block นานขึ้น · แต่เมื่อให้ยาซ้ำหรือขนาดสูง (&gt;3–5 mg/kg) จะเปลี่ยนเป็น <b>phase 2 block</b> ซึ่งมีลักษณะคล้าย non-depolarizing (มี fade)"
+    },
+    {
+      stem:"ผู้ป่วยรายใดเสี่ยงต่อภาวะโพแทสเซียมในเลือดสูงหลังได้ succinylcholine น้อยที่สุด",
+      opts:["ผู้ป่วยแผลไหม้ระดับสองที่ผ่านมาแล้ว 48 ชั่วโมง","ผู้ป่วยไตวายระยะสุดท้ายที่ค่าโพแทสเซียม 4.5 mEq/L","ผู้ป่วยบาดเจ็บไขสันหลังมาแล้ว 1 เดือน","ผู้ป่วย Duchenne muscular dystrophy"],
+      ans:1,
+      exp:"<b>ไตวายที่ค่าโพแทสเซียมปกติไม่ใช่ข้อห้าม</b> — succinylcholine เพิ่ม K ประมาณ 0.5 mEq/L เท่ากับคนทั่วไป · ส่วนแผลไหม้, บาดเจ็บไขสันหลัง และโรคกล้ามเนื้อ ล้วนมี <b>extrajunctional receptor เพิ่มขึ้น</b> ทำให้ปล่อยโพแทสเซียมมหาศาลจนหัวใจหยุดเต้นได้"
+    },
+    {
+      stem:"ข้อใดเป็นข้อห้ามของการใช้ succinylcholine",
+      opts:["ผู้ป่วยที่ต้องทำ rapid sequence induction","ผู้ป่วย Duchenne muscular dystrophy","ผู้ป่วยที่มีกระเพาะอาหารเต็ม","ผู้ป่วยที่คาดว่าจะใส่ท่อช่วยหายใจยาก"],
+      ans:1,
+      exp:"<b>Duchenne muscular dystrophy</b> และโรคกล้ามเนื้ออื่น ๆ เป็นข้อห้าม เพราะเสี่ยง rhabdomyolysis, hyperkalemic cardiac arrest และ MH-like reaction โดยเฉพาะในเด็กชาย · ส่วน RSI และ full stomach เป็น<b>ข้อบ่งชี้</b>ของ succinylcholine ไม่ใช่ข้อห้าม"
+    },
+    {
+      stem:"ผู้ป่วยได้ succinylcholine ขนาดปกติเพียงครั้งเดียว แต่กล้ามเนื้อยังไม่คลายตัวนานถึง 3 ชั่วโมง สาเหตุที่เป็นไปได้มากที่สุด",
+      opts:["ภาวะ malignant hyperthermia ระยะเริ่มต้น","ภาวะ atypical pseudocholinesterase","ภาวะ phase 2 block จากยาเกินขนาด","ภาวะ myasthenia gravis ที่ยังไม่ได้วินิจฉัย"],
+      ans:1,
+      exp:"<b>Atypical (หรือขาด) pseudocholinesterase</b> ทำให้ยาถูกสลายช้ามาก เกิด prolonged apnea ได้หลายชั่วโมงหลังได้ยาเพียงครั้งเดียว · การจัดการคือ <b>ช่วยหายใจต่อและให้ยาระงับความรู้สึกจนกว่ายาจะหมดฤทธิ์</b> ไม่มียาแก้ฤทธิ์จำเพาะ และควรตรวจ dibucaine number ยืนยันภายหลัง"
+    }
+  ]
+},
+{
+  sec:"หมวด 2 · Non-depolarizing agents",
+  note:"การกำจัดยา metabolite และการเลือกใช้ตามการทำงานของอวัยวะ",
+  qs:[
+    {
+      stem:"Laudanosine เป็น metabolite ของยาชนิดใด",
+      opts:["Atracurium","Vecuronium","Succinylcholine","Rocuronium"],
+      ans:0,
+      exp:"<b>Atracurium</b> สลายด้วย Hofmann elimination ได้ <b>laudanosine</b> ซึ่งกระตุ้นระบบประสาทส่วนกลางและอาจทำให้ชักหากสะสมในปริมาณสูง (พบในการให้ต่อเนื่องนานในผู้ป่วย ICU) · cisatracurium ให้ laudanosine น้อยกว่าเพราะใช้ขนาดยาต่ำกว่ามาก"
+    },
+    {
+      stem:"ยาหย่อนกล้ามเนื้อชนิดใดถูกขับออกทางไตมากที่สุด",
+      opts:["Atracurium","Pancuronium","Rocuronium","Succinylcholine"],
+      ans:1,
+      exp:"<b>Pancuronium</b> ขับออกทางไตเป็นหลัก (~80%) จึงออกฤทธิ์นานผิดปกติในผู้ป่วยไตวาย · rocuronium ขับทางตับ/น้ำดีเป็นหลัก, atracurium และ cisatracurium ใช้ Hofmann elimination ที่ไม่ขึ้นกับตับหรือไต จึงปลอดภัยที่สุดในไตวาย"
+    },
+    {
+      stem:"ข้อดีของ rocuronium ที่เหนือกว่ายาอื่นในกลุ่ม non-depolarizing คือข้อใด",
+      opts:["ไม่จำเป็นต้องแก้ฤทธิ์เมื่อจบการผ่าตัด","ออกฤทธิ์เร็วที่สุดในกลุ่มนี้","หมดฤทธิ์เร็วที่สุดในกลุ่มนี้","ปลอดภัยที่สุดในผู้ป่วยโรคไต"],
+      ans:1,
+      exp:"<b>Rocuronium มี onset เร็วที่สุด</b>ในกลุ่ม non-depolarizing (ประมาณ 60–90 วินาทีเมื่อใช้ 1.0–1.2 mg/kg) จึงใช้ทดแทน succinylcholine ในการทำ RSI ได้ · แต่ duration ยาว (30–60 นาที) ต้องแก้ฤทธิ์ และขับทางตับจึงไม่ใช่ยาที่ปลอดภัยที่สุดในไตวาย"
+    },
+    {
+      stem:"ความแตกต่างที่สำคัญระหว่าง atracurium กับ cisatracurium คือข้อใด",
+      opts:["น้ำหนักโมเลกุลของยา","การเกิด laudanosine","การกระตุ้นการหลั่ง histamine","วิถีการขับยาออกจากร่างกาย"],
+      ans:2,
+      exp:"<b>Cisatracurium แทบไม่กระตุ้นการหลั่ง histamine</b> ต่างจาก atracurium ที่ทำให้เกิดผื่นแดง ความดันตก และหลอดลมหดเกร็งได้ · ทั้งสองตัวใช้ Hofmann elimination เหมือนกันและได้ laudanosine เช่นกัน (cisatracurium ได้น้อยกว่าเพราะใช้ขนาดต่ำกว่า)"
+    },
+    {
+      stem:"Cisatracurium ถูกกำจัดออกจากร่างกายด้วยวิธีใดเป็นหลัก",
+      opts:["Hofmann elimination ที่ขึ้นกับ pH และอุณหภูมิ","การขับออกทางไตโดยไม่เปลี่ยนแปลง","การเปลี่ยนแปลงที่ตับโดยเอนไซม์ P450","การสลายด้วย pseudocholinesterase ในพลาสมา"],
+      ans:0,
+      exp:"<b>Hofmann elimination</b> เป็นการสลายตัวเองทางเคมีที่ขึ้นกับ pH และอุณหภูมิของร่างกาย ไม่ต้องอาศัยตับหรือไต · ดังนั้นภาวะ <b>hypothermia และ acidosis จะทำให้ยาออกฤทธิ์นานขึ้น</b> ส่วน alkalosis และไข้จะเร่งการสลายตัว"
+    },
+    {
+      stem:"ยาหย่อนกล้ามเนื้อชนิดใดมีฤทธิ์ vagolytic ทำให้ชีพจรเร็วขึ้น",
+      opts:["Atracurium","Pancuronium","Cisatracurium","Vecuronium"],
+      ans:1,
+      exp:"<b>Pancuronium</b> มีฤทธิ์ vagolytic (ยับยั้ง muscarinic receptor ที่หัวใจ) และยับยั้งการเก็บกลับ norepinephrine → ทำให้ <b>ชีพจรเร็ว ความดันสูง cardiac output เพิ่ม</b> จึงไม่เหมาะกับผู้ป่วยโรคหัวใจขาดเลือดหรือหัวใจเต้นเร็วอยู่เดิม"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับยากลุ่ม non-depolarizing",
+      opts:["Rocuronium แก้ฤทธิ์ได้ด้วย sugammadex","Pancuronium ถูกกำจัดด้วย Hofmann elimination","Rocuronium ถูกขับออกทางไตเป็นหลัก","Metabolite ของ vecuronium คือ laudanosine"],
+      ans:0,
+      exp:"<b>Sugammadex จับกับ aminosteroid</b> ได้แก่ rocuronium (ดีที่สุด), vecuronium และ pancuronium · pancuronium ขับทางไต ไม่ใช่ Hofmann, rocuronium ขับทางตับ/น้ำดีเป็นหลัก และ laudanosine เป็น metabolite ของ atracurium ไม่ใช่ vecuronium"
+    },
+    {
+      stem:"ผู้ป่วยที่มีทั้งภาวะตับวายและไตวายควรเลือกใช้ยาหย่อนกล้ามเนื้อชนิดใด",
+      opts:["Cisatracurium","Pancuronium","Rocuronium","Vecuronium"],
+      ans:0,
+      exp:"<b>Cisatracurium</b> ใช้ Hofmann elimination ซึ่งเป็นกระบวนการทางเคมีในกระแสเลือด ไม่ต้องพึ่งตับหรือไต จึงเป็นตัวเลือกที่ดีที่สุดในผู้ป่วยที่มีความบกพร่องของทั้งสองอวัยวะ · pancuronium (ไต), rocuronium และ vecuronium (ตับ) ล้วนออกฤทธิ์นานผิดปกติ"
+    }
+  ]
+},
+{
+  sec:"หมวด 3 · Reversal Agents",
+  note:"Anticholinesterase และ sugammadex",
+  qs:[
+    {
+      stem:"กลไกการออกฤทธิ์ของยากลุ่ม anticholinesterase คือข้อใด",
+      opts:["จับกับยา non-depolarizing โดยตรงในกระแสเลือด","จับกับ acetylcholine receptor ที่ postsynaptic","จับกับเอนไซม์ cholinesterase","จับกับ nicotinic receptor ที่ presynaptic"],
+      ans:2,
+      exp:"Anticholinesterase (neostigmine, pyridostigmine, edrophonium) <b>ยับยั้งเอนไซม์ acetylcholinesterase</b> ทำให้ acetylcholine ที่ NMJ สะสมมากขึ้นจนแข่งขันเอาชนะยาหย่อนกล้ามเนื้อได้ · ต่างจาก sugammadex ที่จับกับตัวยาโดยตรง"
+    },
+    {
+      stem:"ข้อใดเป็นผลจากการให้ยาแก้ฤทธิ์กลุ่ม anticholinesterase",
+      opts:["กระตุ้นการทำงานของระบบ sympathetic","ลดการหลั่ง acetylcholine บริเวณ postsynaptic","เพิ่ม nicotinic transmission และเพิ่มผลที่ muscarinic receptor","เพิ่ม muscarinic transmission และลด nicotinic receptor"],
+      ans:2,
+      exp:"Acetylcholine ที่เพิ่มขึ้นออกฤทธิ์ทั้งสองแบบ — <b>nicotinic</b> ที่ NMJ (ผลที่ต้องการ คือกล้ามเนื้อกลับมาแรง) และ <b>muscarinic</b> ทั่วร่างกาย (ผลข้างเคียง: ชีพจรช้า น้ำลายมาก ลำไส้บีบตัว หลอดลมตีบ) จึงต้องให้ยา antimuscarinic ควบคู่เสมอ"
+    },
+    {
+      stem:"ข้อใดไม่ใช่ผลข้างเคียงของยากลุ่ม anticholinesterase",
+      opts:["Bradycardia","Bronchodilatation","การบีบตัวของลำไส้เพิ่มขึ้น","การหลั่งน้ำลายเพิ่มขึ้น"],
+      ans:1,
+      exp:"Anticholinesterase ทำให้เกิด <b>bronchoconstriction</b> (หลอดลมตีบ) ไม่ใช่ขยาย จึงต้องระวังในผู้ป่วยหอบหืด · ผลข้างเคียง muscarinic อื่น ๆ ได้แก่ หัวใจเต้นช้า น้ำลายและสารคัดหลั่งมาก ลำไส้บีบตัวเพิ่ม คลื่นไส้อาเจียน และรูม่านตาหด"
+    },
+    {
+      stem:"เหตุใดจึงต้องให้ atropine หรือ glycopyrrolate ร่วมกับ neostigmine",
+      opts:["เพื่อเสริมฤทธิ์การแก้ยาหย่อนกล้ามเนื้อให้เร็วขึ้น","เพื่อลดผลข้างเคียงที่ muscarinic receptor","เพื่อป้องกันการเกิด recurarization ภายหลัง","เพื่อเพิ่มระดับ acetylcholine ที่ neuromuscular junction"],
+      ans:1,
+      exp:"ให้ antimuscarinic เพื่อ <b>ปิดกั้นผลข้างเคียง muscarinic</b> โดยเฉพาะ bradycardia ที่อาจรุนแรงถึงหัวใจหยุดเต้น · เลือก <b>glycopyrrolate คู่กับ neostigmine</b> เพราะ onset ใกล้เคียงกัน ส่วน atropine ออกฤทธิ์เร็วกว่าจึงเหมาะกับ edrophonium"
+    },
+    {
+      stem:"ข้อใดไม่ถูกต้องเกี่ยวกับ sugammadex",
+      opts:["มีอันตรกิริยากับยาเม็ดคุมกำเนิด","ทำให้เกิดภาวะหัวใจเต้นช้าได้","ใช้แก้ฤทธิ์ cisatracurium ได้","มีรายงานการเกิด recurarization"],
+      ans:2,
+      exp:"<b>Sugammadex ใช้แก้ฤทธิ์ cisatracurium ไม่ได้</b> เพราะจับได้เฉพาะยากลุ่ม aminosteroid (rocuronium, vecuronium, pancuronium) ไม่จับกลุ่ม benzylisoquinolinium · ส่วนอันตรกิริยากับยาคุมกำเนิด (ต้องคุมด้วยวิธีอื่น 7 วัน), bradycardia และ recurarization เมื่อให้ขนาดไม่พอ ล้วนเป็นข้อเท็จจริง"
+    },
+    {
+      stem:"ขนาดของ sugammadex สำหรับการแก้ฤทธิ์ในระดับ moderate block (TOF count 2) คือข้อใด",
+      opts:["2 mg/kg","4 mg/kg","8 mg/kg","16 mg/kg"],
+      ans:0,
+      exp:"ขนาดของ sugammadex ตามความลึกของ block: <b>moderate block (TOF count ≥ 2) = 2 mg/kg</b>, deep block (PTC 1–2, ยังไม่มี TOF response) = 4 mg/kg, และ <b>immediate reversal</b> หลังให้ rocuronium 1.2 mg/kg ทันที = 16 mg/kg"
+    },
+    {
+      stem:"ผู้ป่วยได้ cisatracurium ระหว่างผ่าตัด เมื่อจบผ่าตัดวัด TOF ได้ 3 ควรจัดการอย่างไร",
+      opts:["ให้ neostigmine 0.05 mg/kg ร่วมกับยา antimuscarinic","ให้ sugammadex 2 mg/kg","ไม่ต้องแก้ฤทธิ์ ช่วยหายใจไปห้องพักฟื้น","ไม่ต้องแก้ฤทธิ์ ถอดท่อช่วยหายใจได้ทันที"],
+      ans:0,
+      exp:"TOF count 3 = ยังมี block คงเหลือ ต้องแก้ฤทธิ์ · cisatracurium เป็นกลุ่ม benzylisoquinolinium จึงใช้ sugammadex ไม่ได้ ต้องใช้ <b>neostigmine 0.05 mg/kg (สูงสุด 5 mg)</b> ร่วมกับ glycopyrrolate · การไม่แก้ฤทธิ์แล้วถอดท่อเสี่ยงต่อ residual paralysis และการสำลัก"
+    }
+  ]
+},
+{
+  sec:"หมวด 4 · Neuromuscular Monitoring",
+  note:"TOF, PTC, ED95 และเกณฑ์การถอดท่อช่วยหายใจ",
+  qs:[
+    {
+      stem:"ค่า ED95 ของยาหย่อนกล้ามเนื้อหมายถึงข้อใด",
+      opts:["ขนาดยาที่ทำให้ twitch height ลดลง 50% ในผู้ป่วย 95%","ขนาดยาที่ทำให้ twitch height ลดลง 95% ในผู้ป่วย 50%","ขนาดยาที่ทำให้ผู้ป่วย 95 ใน 100 คนหยุดหายใจ","ขนาดยาที่ทำให้ค่า TOF ratio ลดลงเหลือ 0.95"],
+      ans:1,
+      exp:"<b>ED95 = ขนาดยาที่กด twitch height ลง 95% ในผู้ป่วยครึ่งหนึ่ง (50%)</b> · ในทางปฏิบัติจึงให้ยาประมาณ 2–3 เท่าของ ED95 เพื่อใส่ท่อช่วยหายใจ เช่น rocuronium ED95 = 0.3 mg/kg จึงใช้ intubating dose 0.6–1.2 mg/kg"
+    },
+    {
+      stem:"เกณฑ์ทางคลินิกข้อใดบ่งชี้ว่ายาหย่อนกล้ามเนื้อคงเหลือในร่างกายน้อยที่สุด",
+      opts:["ค่า vital capacity อยู่ในเกณฑ์ปกติ","ค่า tidal volume อยู่ในเกณฑ์ปกติ","ค่า minimum inspiratory pressure เท่ากับ -15 cmH₂O","ยกศีรษะค้างได้นานกว่า 5 วินาที"],
+      ans:3,
+      exp:"<b>การยกศีรษะค้าง 5 วินาที</b> เป็นเกณฑ์ทางคลินิกที่เข้มงวดที่สุด (สัมพันธ์กับ TOF ratio ~0.7 ขึ้นไป) เพราะต้องอาศัยกล้ามเนื้อที่ไวต่อยามาก · ส่วน tidal volume และ vital capacity ปกติอาจพบได้แม้ยังมี block เหลืออยู่ จึงเชื่อถือได้น้อยกว่า"
+    },
+    {
+      stem:"ค่า TOF ratio เท่าใดที่ถือว่าปลอดภัยเพียงพอสำหรับการถอดท่อช่วยหายใจ",
+      opts:["มากกว่าหรือเท่ากับ 0.5","มากกว่าหรือเท่ากับ 0.7","มากกว่าหรือเท่ากับ 0.9","มากกว่าหรือเท่ากับ 1.2"],
+      ans:2,
+      exp:"เกณฑ์ปัจจุบันคือ <b>TOF ratio ≥ 0.9</b> · ที่ค่าระหว่าง 0.7–0.9 ผู้ป่วยยังมีกล้ามเนื้อคอหอยอ่อนแรง การกลืนบกพร่อง และการตอบสนองต่อภาวะพร่องออกซิเจนลดลง ทำให้เสี่ยงต่อการสำลักและอุดกั้นทางเดินหายใจหลังถอดท่อ"
+    },
+    {
+      stem:"หลังแก้ฤทธิ์ยาหย่อนกล้ามเนื้อ กลุ่มกล้ามเนื้อใดกลับมาทำงานได้ช้าที่สุด",
+      opts:["Adductor pollicis","Diaphragm","กล้ามเนื้อบริเวณคอหอย (pharynx)","Masseter"],
+      ans:2,
+      exp:"<b>กล้ามเนื้อคอหอยไวต่อยาหย่อนกล้ามเนื้อมากที่สุดและฟื้นตัวช้าที่สุด</b> จึงเป็นเหตุผลที่ผู้ป่วยอาจกลืนไม่ได้และสำลักทั้งที่กำลังของมือดูปกติแล้ว · ลำดับการฟื้นตัวโดยทั่วไป: กะบังหลม → กล้ามเนื้อมัดใหญ่ → adductor pollicis → กล้ามเนื้อคอหอยและทางเดินหายใจส่วนบน"
+    },
+    {
+      stem:"กล้ามเนื้อกลุ่มใดตอบสนองต่อยาหย่อนกล้ามเนื้อได้เร็วและฟื้นตัวเร็วที่สุด",
+      opts:["Adductor pollicis","Diaphragm","Orbicularis oculi","กล้ามเนื้อบริเวณคอหอย"],
+      ans:1,
+      exp:"<b>กะบังลม (diaphragm)</b> ดื้อต่อยาหย่อนกล้ามเนื้อมากที่สุด ต้องใช้ยาสูงกว่าประมาณ 1.5–2 เท่าเมื่อเทียบกับ adductor pollicis และฟื้นตัวเร็วที่สุด · จึงพบผู้ป่วยหายใจเองได้แล้วแต่ยังยกศีรษะไม่ขึ้นและกลืนไม่ได้"
+    },
+    {
+      stem:"การกระตุ้นแบบ post-tetanic count (PTC) ใช้ประเมินสิ่งใด",
+      opts:["ระดับ block ที่ลึกจนไม่มีการตอบสนองต่อ TOF","ระดับ block ที่ใกล้ฟื้นตัวเต็มที่แล้ว","ความแรงของยาหย่อนกล้ามเนื้อที่ใช้","ความเพียงพอของการให้ยาแก้ฤทธิ์"],
+      ans:0,
+      exp:"<b>PTC ใช้เมื่อ block ลึกมากจน TOF count = 0</b> โดยกระตุ้นแบบ tetanus แล้วนับ twitch ที่ตามมา · ยิ่งนับได้น้อยยิ่ง block ลึก (PTC 1–2 = deep block) · เมื่อกลับมาฟื้นตัวจะใช้ TOF count และ TOF ratio ในการประเมินแทน"
+    }
+  ]
+},
+{
+  sec:"หมวด 5 · ปัจจัยที่มีผลต่อฤทธิ์ยา",
+  note:"ภาวะทางเมตาบอลิก ยาอื่น และโรคประจำตัว",
+  qs:[
+    {
+      stem:"ภาวะใดเสริมฤทธิ์ของยาหย่อนกล้ามเนื้อ",
+      opts:["Hypercalcemia","Hypokalemia","Hypomagnesemia","Metabolic alkalosis"],
+      ans:1,
+      exp:"<b>Hypokalemia</b> ทำให้เยื่อหุ้มเซลล์ hyperpolarize จึงเสริมฤทธิ์ยาหย่อนกล้ามเนื้อและทำให้ออกฤทธิ์นานขึ้น · ภาวะอื่นที่เสริมฤทธิ์: <b>hypermagnesemia, hypocalcemia, acidosis, hypothermia</b> · ตรงข้ามกับ hypercalcemia และ hypomagnesemia ที่ลดฤทธิ์ยา"
+    },
+    {
+      stem:"Magnesium sulfate มีผลต่อยาหย่อนกล้ามเนื้ออย่างไร",
+      opts:["ต้านฤทธิ์กลุ่ม non-depolarizing จึงต้องเพิ่มขนาดยา","ไม่มีผลต่อยาหย่อนกล้ามเนื้อทุกกลุ่ม","เสริมฤทธิ์กลุ่ม non-depolarizing จึงควรลดขนาดยา","เสริมฤทธิ์เฉพาะกลุ่ม depolarizing เท่านั้น"],
+      ans:2,
+      exp:"Magnesium ยับยั้งการหลั่ง acetylcholine ที่ presynaptic และลดความไวของ motor endplate จึง <b>เสริมฤทธิ์ non-depolarizing อย่างมาก</b> · ในผู้ป่วย severe preeclampsia ที่ได้ MgSO₄ ต้อง <b>ลดขนาดยาหย่อนกล้ามเนื้อ</b> และติดตามด้วย nerve stimulator อย่างใกล้ชิด"
+    },
+    {
+      stem:"ผู้ป่วย myasthenia gravis ตอบสนองต่อยาหย่อนกล้ามเนื้ออย่างไร",
+      opts:["ไวต่อกลุ่ม non-depolarizing และดื้อต่อ succinylcholine","ดื้อต่อกลุ่ม non-depolarizing และไวต่อ succinylcholine","ไวต่อยาทั้งสองกลุ่มเท่า ๆ กัน","ดื้อต่อยาทั้งสองกลุ่มเท่า ๆ กัน"],
+      ans:0,
+      exp:"MG มีจำนวน acetylcholine receptor <b>ลดลง</b> จากภูมิคุ้มกันทำลาย → <b>ไวต่อ non-depolarizing มาก</b> (ต้องลดขนาดเหลือ 1/10–1/2) และ <b>ดื้อต่อ succinylcholine</b> (ต้องเพิ่มขนาด) · ตรงข้ามกับ Eaton-Lambert syndrome ที่ไวต่อยาทั้งสองกลุ่ม"
+    },
+    {
+      stem:"ภาวะใดไม่ทำให้จำนวน acetylcholine receptor เพิ่มขึ้น",
+      opts:["ภาวะ myasthenia gravis","ภาวะอัมพาตครึ่งซีก","การบาดเจ็บจากไฟไหม้","การได้รับยาหย่อนกล้ามเนื้อเป็นเวลานาน"],
+      ans:0,
+      exp:"<b>MG มี receptor ลดลง</b> (down-regulation จาก autoantibody) ต่างจากภาวะอื่นที่ทำให้เกิด <b>up-regulation ของ extrajunctional receptor</b> ได้แก่ การขาดการทำงานของเส้นประสาท (อัมพาต, บาดเจ็บไขสันหลัง), แผลไหม้ และการนอนนิ่งหรือได้ยาหย่อนกล้ามเนื้อนาน ๆ ซึ่งกลุ่มหลังนี้เสี่ยง hyperkalemia จาก succinylcholine"
+    },
+    {
+      stem:"ยาปฏิชีวนะกลุ่มใดเสริมฤทธิ์ยาหย่อนกล้ามเนื้อได้มากที่สุด",
+      opts:["Penicillin","Cephalosporin","Metronidazole","Aminoglycoside"],
+      ans:3,
+      exp:"<b>Aminoglycoside</b> (gentamicin, amikacin) ยับยั้งการหลั่ง acetylcholine ที่ presynaptic โดยรบกวนการเข้าของแคลเซียม จึงเสริมฤทธิ์ยาหย่อนกล้ามเนื้อและทำให้เกิด residual paralysis ได้ · กลุ่มอื่นที่มีผลคล้ายกันคือ polymyxin, clindamycin และ tetracycline"
+    },
+    {
+      stem:"ภาวะอุณหภูมิกายต่ำมีผลต่อยาหย่อนกล้ามเนื้ออย่างไร",
+      opts:["ทำให้ยาออกฤทธิ์สั้นลง","ทำให้ยาออกฤทธิ์นานขึ้น","ไม่มีผลต่อระยะเวลาการออกฤทธิ์","ทำให้ต้องเพิ่มขนาดยาเป็นสองเท่า"],
+      ans:1,
+      exp:"Hypothermia ทำให้ <b>ยาออกฤทธิ์นานขึ้น</b> จากการทำงานของตับและไตช้าลง เมตาบอลิซึมลดลง และโดยเฉพาะกับ atracurium/cisatracurium ที่ Hofmann elimination <b>ขึ้นกับอุณหภูมิและ pH โดยตรง</b> · จึงเป็นสาเหตุสำคัญของ residual paralysis ในการผ่าตัดนานที่ผู้ป่วยตัวเย็น"
+    }
+  ]
+},
+{
+  sec:"หมวด 6 · สถานการณ์ทางคลินิก",
+  note:"การเลือกยาและการจัดการเหตุการณ์เฉพาะหน้า",
+  qs:[
+    {
+      stem:"ชาย 76 ปี มีโรคไตเรื้อรัง Cr 2.8 mg/dL มาผ่าตัด appendectomy ควรเลือกยาหย่อนกล้ามเนื้อข้อใด",
+      opts:["Cisatracurium 0.2 mg/kg","Succinylcholine 1.5 mg/kg","Rocuronium 0.5 mg/kg","Rocuronium 1.0 mg/kg"],
+      ans:0,
+      exp:"<b>Cisatracurium</b> เหมาะที่สุดเพราะ Hofmann elimination ไม่ขึ้นกับไต จึงไม่สะสมและไม่เกิด prolonged block · rocuronium ขับทางตับแต่ยังยาวนานขึ้นได้ในผู้สูงอายุ ส่วน succinylcholine ต้องระวัง hyperkalemia ในผู้ป่วยไตเรื้อรังที่มี K สูงอยู่เดิม"
+    },
+    {
+      stem:"ผู้ป่วย epiglottitis ได้รับ propofol และ atracurium แล้วพบว่าช่วยหายใจไม่ได้และใส่ท่อช่วยหายใจไม่ได้ ควรทำอย่างไร",
+      opts:["ใส่ laryngeal mask airway แทน","พยายามช่วยหายใจต่อและรอให้ผู้ป่วยตื่น","ทำ cricothyroidotomy","แก้ฤทธิ์ยาหย่อนกล้ามเนื้อด้วย neostigmine"],
+      ans:2,
+      exp:"นี่คือภาวะ <b>cannot intubate, cannot oxygenate (CICO)</b> ในผู้ป่วยที่ทางเดินหายใจอุดกั้นจากการบวม → ต้องทำ <b>emergency front-of-neck access (cricothyroidotomy)</b> ทันที · การรอให้ตื่นไม่ทันการณ์ (atracurium ออกฤทธิ์นาน) และ neostigmine ก็ไม่ได้แก้การอุดกั้นเชิงกายวิภาค"
+    },
+    {
+      stem:"การใช้ pancuronium ไม่เหมาะสมในผู้ป่วยรายใดมากที่สุด",
+      opts:["ผู้ป่วยที่มีภาวะ atrial fibrillation ที่ควบคุมอัตราการเต้นไม่ได้","ผู้ป่วยที่มีความดันโลหิตต่ำจากการเสียเลือด","ผู้ป่วยที่ต้องเข้ารับการผ่าตัดนานหลายชั่วโมง","ผู้ป่วยที่มีการทำงานของตับอยู่ในเกณฑ์ปกติ"],
+      ans:0,
+      exp:"Pancuronium มีฤทธิ์ <b>vagolytic และ sympathomimetic</b> ทำให้ชีพจรเร็วขึ้น จึงทำให้ AF ที่ควบคุม rate ไม่ได้แย่ลง และเพิ่มความต้องการออกซิเจนของกล้ามเนื้อหัวใจ · ในทางกลับกัน ผลนี้อาจเป็นประโยชน์ในผู้ป่วยที่มีความดันต่ำหรือชีพจรช้า"
+    },
+    {
+      stem:"ผู้ป่วยที่มี residual paralysis หลังผ่าตัด ควรเฝ้าระวังภาวะใดมากที่สุด",
+      opts:["กล้ามเนื้อควบคุมการกลืนอ่อนแรง ทำให้เสี่ยงต่อการสำลัก","กล้ามเนื้อกะบังลมอ่อนแรงจนหยุดหายใจทันที","อาการปวดกล้ามเนื้อทั่วร่างกายอย่างรุนแรง","ความดันโลหิตสูงขึ้นอย่างเฉียบพลัน"],
+      ans:0,
+      exp:"กล้ามเนื้อคอหอยและทางเดินหายใจส่วนบนไวต่อยาที่สุดและฟื้นช้าที่สุด → ผู้ป่วยจึง <b>กลืนไม่ได้ ป้องกันทางเดินหายใจไม่ได้ และเสี่ยงสำลัก</b> ทั้งที่หายใจเองและขยับแขนขาได้แล้ว · นี่คือเหตุผลที่ต้องยืนยันด้วย TOF ratio ≥ 0.9 ก่อนถอดท่อ"
+    },
+    {
+      stem:"ผู้ป่วย myasthenia gravis ที่รับประทาน pyridostigmine เป็นประจำ ควรจัดการยาหย่อนกล้ามเนื้ออย่างไร",
+      opts:["ลดขนาดยากลุ่ม non-depolarizing และติดตามด้วย nerve stimulator","เพิ่มขนาดยากลุ่ม non-depolarizing เป็นสองเท่าของขนาดปกติ","ใช้ succinylcholine ในขนาดปกติโดยไม่ต้องปรับ","หลีกเลี่ยงการใช้ nerve stimulator ในผู้ป่วยกลุ่มนี้"],
+      ans:0,
+      exp:"ผู้ป่วย MG ไวต่อ non-depolarizing มาก จึงต้อง <b>ลดขนาดยาลงอย่างมากและติดตามด้วย nerve stimulator ตลอด</b> หรือหลีกเลี่ยงยากลุ่มนี้ไปเลยโดยใช้ยาดมสลบลึกแทน · pyridostigmine ที่ผู้ป่วยกินอยู่ยังยับยั้ง plasma cholinesterase ทำให้ succinylcholine ออกฤทธิ์นานขึ้นด้วย"
+    }
+  ]
+}
+];
+
+let answered=0, correct=0, totalQ=0;
+let autoSubmitted=false, leftReported=false;
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbylYFUwXHFjob1851FmezQHPk2hQD15q-TGK9O8B-v37us_JhLaT0_8-pK8AaeYfR_Gmw/exec";
+const QUIZ_NAME = "Muscle Relaxant (40 ข้อ)";
+const KEYS=["ก","ข","ค","ง"];
+const quiz=document.getElementById("quiz");
+
+DATA.forEach((sec,si)=>{
+  const head=document.createElement("div");
+  head.className="section-head";
+  head.innerHTML=`<span class="no">0${si+1}</span><h2>${sec.sec}</h2>`;
+  quiz.appendChild(head);
+  const note=document.createElement("p");
+  note.className="section-note";note.textContent=sec.note;
+  quiz.appendChild(note);
+
+  sec.qs.forEach((q)=>{
+    totalQ++;
+    const n=totalQ;
+    const card=document.createElement("div");
+    card.className="q";
+    card.innerHTML=`
+      <div class="q-top"><span class="qno">Q${n}</span><div class="stem">${q.stem}</div></div>
+      <ul class="opts" data-ans="${q.ans}"></ul>
+      <div class="explain"><span class="tag">เฉลย · คำอธิบาย</span><div class="etext"></div></div>`;
+    const ul=card.querySelector(".opts");
+    q.opts.forEach((o,oi)=>{
+      const li=document.createElement("li");
+      li.className="opt";
+      li.innerHTML=`<span class="k">${KEYS[oi]}.</span><span>${o}</span>`;
+      li.addEventListener("click",()=>choose(card,ul,oi,q));
+      ul.appendChild(li);
+    });
+    card.querySelector(".etext").innerHTML=q.exp;
+    quiz.appendChild(card);
+  });
+});
+document.getElementById("total").textContent=totalQ;
+
+function choose(card,ul,oi,q){
+  if(ul.dataset.done)return;
+  ul.dataset.done="1";
+  [...ul.children].forEach((li,i)=>{
+    li.classList.add("locked");
+    if(i===q.ans)li.classList.add("correct");
+    else if(i===oi)li.classList.add("wrong");
+    else li.classList.add("dim");
+  });
+  card.querySelector(".explain").classList.add("show");
+  answered++;
+  if(oi===q.ans)correct++;
+  updateScore();
+}
+function updateScore(){
+  document.getElementById("score").textContent=correct;
+  document.getElementById("answered").textContent=answered;
+  document.getElementById("fill").style.width=(answered/totalQ*100)+"%";
+  if(answered===totalQ && !autoSubmitted){
+    autoSubmitted=true;
+    submitScore();
+  }
+}
+function setStatus(msg,cls){
+  const el=document.getElementById("submitStatus");
+  if(!el) return;
+  el.textContent=msg; el.className="submitstatus"+(cls?(" "+cls):"");
+}
+function buildPayload(){
+  return {
+    name:(document.getElementById("takerName").value||"").trim(),
+    score:correct, total:totalQ, answered:answered,
+    set:QUIZ_NAME,
+    status: answered===totalQ ? "ครบ" : "ไม่ครบ"
+  };
+}
+function submitScore(retry){
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  const p=buildPayload();
+  setStatus("กำลังส่งคะแนน…");
+  fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(p)})
+  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓","ok"); })
+  .catch(()=>{
+    if(!retry){ setTimeout(()=>submitScore(true),1500); return; }
+    setStatus("ส่งคะแนนอัตโนมัติไม่สำเร็จ","err");
+  });
+}
+function reportAbandon(){
+  if(autoSubmitted || leftReported || answered===0) return;
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  leftReported=true;
+  const p=buildPayload();
+  try{ navigator.sendBeacon(SUBMIT_URL, JSON.stringify(p)); }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") reportAbandon(); });
+window.addEventListener("pagehide", reportAbandon);
+function resetQuiz(){
+  answered=0;correct=0;autoSubmitted=false;leftReported=false;
+  document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
+  document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));
+  setStatus("");
+  updateScore();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>

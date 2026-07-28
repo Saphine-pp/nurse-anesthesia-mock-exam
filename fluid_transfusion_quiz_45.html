@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข้อสอบ Fluid &amp; Transfusion — 45 ข้อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF1F4;--panel:#FFFFFF;--ink:#16232B;--muted:#54666F;--line:#D2DBE1;
+    --aqua:#1C6480;--aqua-soft:#DFEDF2;--signal:#1F9D63;--signal-soft:#E4F4EC;
+    --alert:#C4463A;--alert-soft:#F8E7E5;--ink-panel:#0F1D25;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px;}
+
+  header.hero{background:var(--ink-panel);color:#E9F2F6;padding:26px 18px 22px;position:relative;overflow:hidden;}
+  .hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#74B9D4;margin:0 0 8px;}
+  .hero h1{font-size:26px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .hero p{margin:0;color:#9FB4BF;font-size:14px;}
+  .badge-hard{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    background:#1B3542;color:#8CC8DE;border:1px solid #3A5F71;border-radius:6px;padding:3px 8px;margin-left:8px;vertical-align:middle;}
+  .drip{position:absolute;left:0;right:0;bottom:0;height:50px;width:100%;z-index:1;opacity:.5;}
+
+  .scorebar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 18px;}
+  .scorebar .inner{max-width:820px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .readout{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);}
+  .readout b{color:var(--aqua);font-weight:600;}
+  .bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden;max-width:240px;}
+  .bar span{display:block;height:100%;width:0;background:var(--aqua);transition:width .4s ease;}
+  .reset{font-family:"IBM Plex Mono",monospace;font-size:12px;background:none;border:1px solid var(--line);
+    color:var(--muted);padding:5px 10px;border-radius:7px;cursor:pointer;}
+  .reset:hover{border-color:var(--aqua);color:var(--aqua);}
+
+  .section-head{display:flex;align-items:baseline;gap:12px;margin:38px 0 6px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  .section-head .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--aqua);font-weight:600;}
+  .section-head h2{font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .section-note{font-size:13px;color:var(--muted);margin:6px 0 16px;}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;margin:0 0 14px;}
+  .q-top{display:flex;gap:11px;align-items:flex-start;}
+  .qno{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;background:var(--aqua-soft);color:var(--aqua);
+    padding:3px 8px;border-radius:6px;flex:none;margin-top:2px;}
+  .stem{font-size:15.5px;font-weight:500;}
+  .opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px;}
+  .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+    cursor:pointer;font-size:14.5px;background:#fff;transition:border-color .15s,background .15s;}
+  .opt:hover{border-color:var(--aqua);background:#FAFCFD;}
+  .opt .k{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--muted);flex:none;}
+  .opt.correct{background:var(--signal-soft);border-color:var(--signal);}
+  .opt.correct .k{color:var(--signal);}
+  .opt.wrong{background:var(--alert-soft);border-color:var(--alert);}
+  .opt.wrong .k{color:var(--alert);}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:.55;}
+
+  .explain{margin-top:12px;border-left:3px solid var(--aqua);background:#F5FAFC;border-radius:0 8px 8px 0;
+    padding:11px 13px;font-size:14px;color:#243740;display:none;}
+  .explain.show{display:block;}
+  .explain .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--aqua);display:block;margin-bottom:4px;}
+  .explain b{color:var(--ink);}
+  .calc{margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:#0F1D25;color:#A9D6E6;
+    padding:9px 11px;border-radius:7px;white-space:pre-wrap;line-height:1.5;}
+
+  footer{margin-top:44px;text-align:center;color:var(--muted);font-size:12.5px;}
+  footer .mono{font-size:11px;letter-spacing:.1em;}
+
+  .namecard{margin:16px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .namecard label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 8px;}
+  .namecard input{width:100%;font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);}
+  .namecard input:focus{outline:none;border-color:var(--ink);}
+  .submitstatus{margin-top:10px;font-size:13px;min-height:18px;text-align:center;}
+  .submitstatus.ok{color:var(--signal);}
+  .submitstatus.err{color:var(--alert);}
+
+  @media print{
+    .scorebar,.reset,.drip,.namecard,.submitstatus{display:none!important;}
+    body{background:#fff;}
+    header.hero{background:#fff;color:#000;border-bottom:2px solid #000;}
+    .eyebrow{color:#000;}.hero p{color:#333;}.badge-hard{color:#000;border-color:#000;background:#eee;}
+    .explain{display:block!important;}
+    .calc{background:#f0f0f0;color:#000;border:1px solid #999;}
+    .opt.correct{outline:2px solid var(--signal);}
+    .q{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Board Prep · Fluid &amp; Blood Component Therapy</p>
+    <h1>ข้อสอบ Fluid &amp; Transfusion<span class="badge-hard">45 ข้อ</span></h1>
+    <p>ชนิดสารน้ำ · การคำนวณ · ส่วนประกอบของเลือด · Massive transfusion · แตะเพื่อดูเฉลย</p>
+  </div>
+  <svg class="drip" viewBox="0 0 820 50" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#74B9D4" stroke-width="2">
+      <path d="M0,44 L820,44"/>
+      <circle cx="150" cy="14" r="4"/><circle cx="330" cy="24" r="4"/>
+      <circle cx="510" cy="10" r="4"/><circle cx="670" cy="30" r="4"/>
+    </g>
+  </svg>
+</header>
+
+<div class="wrap">
+  <div class="namecard">
+    <label for="takerName">ชื่อ–นามสกุล ของผู้ทำ (ไม่บังคับ)</label>
+    <input id="takerName" type="text" placeholder="กรอกชื่อก่อนเริ่มทำข้อสอบ หากอยากให้ปรากฏใน Dashboard" maxlength="60" autocomplete="name">
+  </div>
+</div>
+
+<div class="scorebar">
+  <div class="inner">
+    <span class="readout">SCORE <b id="score">0</b>/<span id="answered">0</span> · <span id="total">45</span> ข้อ</span>
+    <div class="bar"><span id="fill"></span></div>
+    <button class="reset" onclick="resetQuiz()">รีเซ็ต</button>
+  </div>
+</div>
+
+<main class="wrap" id="quiz"></main>
+<div class="wrap"><div id="submitStatus" class="submitstatus"></div></div>
+
+<footer class="wrap">
+  <p>ข้อสอบต้นฉบับ เรียบเรียงแนวจากคลังข้อสอบเก่าในโปรเจกต์ — ใช้เพื่อฝึกทบทวนเท่านั้น</p>
+  <p class="mono">FLUID &amp; TRANSFUSION SET · 45 ITEMS · v1</p>
+</footer>
+
+<script>
+const DATA = [
+{
+  sec:"หมวด 1 · ชนิดและองค์ประกอบของสารน้ำ",
+  note:"Osmolality ผลต่อสมดุลกรด-ด่าง และการเลือกใช้ตามภาวะของผู้ป่วย",
+  qs:[
+    {
+      stem:"สารน้ำในข้อใดมีค่า osmolality ต่ำที่สุด",
+      opts:["Acetate ringer solution","0.9% NSS","3% NaCl","5% dextrose in NSS/2"],
+      ans:0,
+      exp:"ค่า osmolality โดยประมาณ: <b>Acetate ringer ~273</b>, NSS 308, 5% D-NSS/2 ~406, 3% NaCl ~1,027 mOsm/L · สารน้ำกลุ่ม balanced crystalloid (Acetar, LRS) มี osmolality ใกล้เคียงหรือต่ำกว่าพลาสมาเล็กน้อย จึงจัดเป็น slightly hypotonic"
+    },
+    {
+      stem:"สารน้ำชนิดใดทำให้เกิดภาวะ hyperchloremic metabolic acidosis",
+      opts:["Acetate ringer solution","0.9% NSS","5% dextrose in N/2","5% albumin"],
+      ans:1,
+      exp:"<b>0.9% NSS</b> มีคลอไรด์ 154 mEq/L ซึ่งสูงกว่าพลาสมา (~100) มาก การให้ปริมาณมากจึงทำให้เกิด <b>hyperchloremic metabolic acidosis</b> (ไม่ใช่ alkalosis) และอาจลดการไหลเวียนเลือดที่ไต · สารน้ำ balanced เช่น Acetar หรือ LRS มี buffer จึงไม่เกิดปัญหานี้"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับสารน้ำ",
+      opts:["5% D/NSS จัดเป็น isotonic solution","5% D/N2 จัดเป็น hypertonic solution","การให้ NSS ปริมาณมากทำให้เกิด hyperchloremic alkalosis","Ringer lactate มีความเข้มข้นของโซเดียมสูงกว่า NSS"],
+      ans:1,
+      exp:"<b>5% D/N2 (~406 mOsm/L) เป็น hypertonic</b> เมื่อวัดที่ถุง แม้เมื่อกลูโคสถูกเผาผลาญแล้วจะเหลือเป็น hypotonic ในร่างกาย · 5% D/NSS ~560 mOsm/L ก็เป็น hypertonic เช่นกัน · NSS ทำให้เกิด acidosis ไม่ใช่ alkalosis และ LRS มีโซเดียม 130 ซึ่ง<b>ต่ำกว่า</b> NSS ที่ 154 mEq/L"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับองค์ประกอบของสารน้ำ",
+      opts:["Acetate ringer มีโซเดียม 154 mEq/L","0.9% NSS มีโซเดียม 144 mEq/L","Ringer lactate มีโพแทสเซียม 4 mEq/L","5% D-NSS/2 มีกลูโคส 100 mg/L"],
+      ans:2,
+      exp:"<b>Ringer lactate มีโพแทสเซียม 4 mEq/L</b> (และ Na 130, Cl 109, Ca 3, lactate 28) · Acetar มี Na 130 ไม่ใช่ 154, NSS มี Na 154 ไม่ใช่ 144 และ 5% dextrose หมายถึงกลูโคส 5 กรัมต่อ 100 ml = 50 g/L ไม่ใช่ 100 mg/L"
+    },
+    {
+      stem:"ผู้ป่วยตับแข็งจากสุรามาด้วยอาเจียนเป็นเลือด ไม่มีภาวะช็อกและไตวาย ผลตรวจ Na 129, K 3.2, Cl 88, HCO₃ 20 สารน้ำใดเหมาะสมที่สุด",
+      opts:["Ringer lactate solution","Acetate ringer solution","0.9% NSS","0.9% NSS ผสม KCl"],
+      ans:3,
+      exp:"ผู้ป่วยมีทั้ง <b>hyponatremia, hypochloremia และ hypokalemia</b> จากการอาเจียน · <b>NSS ผสม KCl</b> จึงตอบโจทย์ทั้งการเติมโซเดียม คลอไรด์ และโพแทสเซียมพร้อมกัน · LRS และ Acetar มีโซเดียมต่ำกว่าและมี lactate/acetate ที่ตับแข็งเปลี่ยนแปลงได้ไม่ดี"
+    },
+    {
+      stem:"สารน้ำชนิดใดควรหลีกเลี่ยงในผู้ป่วยที่มีภาวะสมองบวม",
+      opts:["0.9% NSS","3% NaCl","5% dextrose in water","Acetate ringer solution"],
+      ans:2,
+      exp:"<b>5% D/W</b> เมื่อกลูโคสถูกเผาผลาญจะเหลือเป็นน้ำเปล่า (free water) ซึ่งเคลื่อนเข้าสู่เซลล์สมองและ<b>ทำให้สมองบวมมากขึ้น</b> · ในผู้ป่วยสมองบวมควรใช้สารน้ำ isotonic หรือ hypertonic เช่น NSS หรือ 3% NaCl เพื่อดึงน้ำออกจากเนื้อสมอง"
+    },
+    {
+      stem:"ผู้ป่วยรายใดมีโอกาสเกิดภาวะโพแทสเซียมในเลือดต่ำมากที่สุด",
+      opts:["ผู้ป่วยที่เตรียมลำไส้ก่อนมาผ่าตัด","ผู้ป่วยเบาหวานที่มีภาวะ ketoacidosis","ผู้ป่วยที่มีการบาดเจ็บของกล้ามเนื้อรุนแรง","ผู้ป่วยที่ได้รับ ACE inhibitor เป็นเวลานาน"],
+      ans:0,
+      exp:"<b>การเตรียมลำไส้ (bowel preparation)</b> ทำให้สูญเสียโพแทสเซียมทางอุจจาระปริมาณมากจนเกิด hypokalemia · ส่วน DKA, rhabdomyolysis และ ACE inhibitor ล้วนเป็นสาเหตุของภาวะโพแทสเซียม<b>สูง</b>"
+    }
+  ]
+},
+{
+  sec:"หมวด 2 · การคำนวณสารน้ำและการเสียเลือด",
+  note:"สูตร 4-2-1, deficit, ABL, EBV และ Parkland formula",
+  qs:[
+    {
+      stem:"ชายไทยน้ำหนัก 60 kg งดน้ำงดอาหารตั้งแต่เวลา 24.00 น. เข้าผ่าตัดเวลา 8.00 น. ควรได้รับ deficit fluid ในชั่วโมงที่ 2 เท่าใด",
+      opts:["100 ml","200 ml","400 ml","600 ml"],
+      ans:1,
+      exp:"คำนวณ maintenance ด้วยสูตร 4-2-1 แล้วคูณด้วยชั่วโมงที่งดน้ำ จากนั้นแบ่งชดเชย <b>ครึ่งหนึ่งในชั่วโมงแรก และหนึ่งในสี่ในชั่วโมงที่ 2 และ 3</b>",
+      calc:"Maintenance = (4×10)+(2×10)+(1×40)\n            = 40+20+40 = 100 ml/hr\nNPO 8 ชม. → deficit = 100×8 = 800 ml\nชม.ที่ 1 = 1/2 × 800 = 400 ml\nชม.ที่ 2 = 1/4 × 800 = 200 ml  ✓\nชม.ที่ 3 = 1/4 × 800 = 200 ml"
+    },
+    {
+      stem:"ชายอายุ 25 ปี น้ำหนัก 50 kg มาผ่าตัด Hct เริ่มต้น 35% ยอมรับให้ Hct ลดลงได้ถึง 25% ค่า allowable blood loss ประมาณเท่าใด",
+      opts:["1,000 ml","1,100 ml","1,200 ml","1,300 ml"],
+      ans:0,
+      exp:"ใช้สูตร ABL = EBV × (Hct เริ่มต้น − Hct ที่ยอมรับได้) ÷ Hct เริ่มต้น โดยผู้ใหญ่ชายใช้ EBV = 70 ml/kg",
+      calc:"EBV = 70 ml/kg × 50 kg = 3,500 ml\nABL = 3,500 × (35 − 25) / 35\n    = 3,500 × 0.286\n    ≈ 1,000 ml"
+    },
+    {
+      stem:"เด็กน้ำหนัก 15 kg งดน้ำงดอาหารมา 6 ชั่วโมง ควรได้รับสารน้ำในชั่วโมงแรกเท่าใด",
+      opts:["150 ml","200 ml","250 ml","300 ml"],
+      ans:1,
+      exp:"ชั่วโมงแรกต้องให้ <b>maintenance บวกกับครึ่งหนึ่งของ deficit</b>",
+      calc:"Maintenance = (4×10)+(2×5) = 50 ml/hr\nDeficit = 50 × 6 = 300 ml\nชม.ที่ 1 = 50 + (1/2 × 300)\n        = 50 + 150 = 200 ml  ✓"
+    },
+    {
+      stem:"เด็กอายุ 5 ปี น้ำหนัก 15 kg เสียเลือด 200 ml ขณะนี้ Hct 24% ต้องการให้ Hct เป็น 30% ควรให้ PRC ประมาณกี่มิลลิลิตร",
+      opts:["75 ml","100 ml","150 ml","200 ml"],
+      ans:1,
+      exp:"ปริมาณ PRC = EBV × (Hct ที่ต้องการ − Hct ปัจจุบัน) ÷ Hct ของ PRC โดยเด็กใช้ EBV ประมาณ 75 ml/kg และ PRC มี Hct ประมาณ 60–70%",
+      calc:"EBV = 75 ml/kg × 15 kg = 1,125 ml\nPRC = 1,125 × (30 − 24) / 65\n    = 1,125 × 0.092\n    ≈ 104 ml → ประมาณ 100 ml"
+    },
+    {
+      stem:"ผู้ป่วยไฟไหม้ 40% TBSA น้ำหนัก 70 kg ตาม Parkland formula ควรให้สารน้ำในอัตราเท่าใดใน 8 ชั่วโมงแรก",
+      opts:["350 ml/hr","700 ml/hr","1,400 ml/hr","2,800 ml/hr"],
+      ans:1,
+      exp:"Parkland formula = 4 ml × น้ำหนัก(kg) × %TBSA ใน 24 ชั่วโมง โดยให้ <b>ครึ่งหนึ่งใน 8 ชั่วโมงแรก</b> นับจากเวลาที่เกิดเหตุ (ไม่ใช่เวลาที่มาถึงโรงพยาบาล) และอีกครึ่งใน 16 ชั่วโมงถัดมา",
+      calc:"รวม 24 ชม. = 4 × 70 × 40 = 11,200 ml\n8 ชม.แรก = 11,200 / 2 = 5,600 ml\nอัตรา = 5,600 / 8 = 700 ml/hr  ✓\n16 ชม.ถัดมา = 5,600 / 16 = 350 ml/hr"
+    },
+    {
+      stem:"ผู้ป่วยผู้ใหญ่น้ำหนัก 70 kg ต้องการสารน้ำแบบ maintenance ตามสูตร 4-2-1 ในอัตราเท่าใด",
+      opts:["90 ml/hr","100 ml/hr","110 ml/hr","130 ml/hr"],
+      ans:2,
+      exp:"สูตร 4-2-1: <b>4 ml/kg/hr สำหรับ 10 kg แรก, 2 ml/kg/hr สำหรับ 10 kg ถัดมา และ 1 ml/kg/hr สำหรับน้ำหนักส่วนที่เหลือ</b>",
+      calc:"10 kg แรก : 4 × 10 = 40 ml/hr\n10 kg ถัดมา: 2 × 10 = 20 ml/hr\n50 kg ที่เหลือ: 1 × 50 = 50 ml/hr\nรวม = 110 ml/hr  ✓\n(ทางลัดผู้ใหญ่ >20 kg: น้ำหนัก + 40)"
+    },
+    {
+      stem:"ผู้ป่วยชายผู้ใหญ่น้ำหนัก 70 kg มีปริมาตรเลือดในร่างกาย (estimated blood volume) ประมาณเท่าใด",
+      opts:["3,500 ml","4,200 ml","4,900 ml","5,600 ml"],
+      ans:2,
+      exp:"ค่า EBV โดยประมาณ: <b>ผู้ใหญ่ชาย 70 ml/kg, ผู้ใหญ่หญิง 65 ml/kg, เด็ก 75 ml/kg, ทารกแรกเกิด 80–90 ml/kg</b>",
+      calc:"EBV = 70 ml/kg × 70 kg = 4,900 ml"
+    }
+  ]
+},
+{
+  sec:"หมวด 3 · Colloid",
+  note:"คุณสมบัติ ผลข้างเคียง และเป้าหมายของการให้สารน้ำ",
+  qs:[
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับสารน้ำกลุ่ม colloid",
+      opts:["Colloid ที่ทำให้เกิดปัญหาการแข็งตัวของเลือดมากที่สุดคือ dextran","Colloid ที่ทำให้เกิด anaphylactoid reaction มากที่สุดคือ HES","Albumin ใช้เป็น first line ในภาวะ acute hypovolemic shock","Colloid ลดค่า plasma oncotic pressure ได้มากกว่า crystalloid"],
+      ans:0,
+      exp:"<b>Dextran รบกวนการแข็งตัวของเลือดมากที่สุด</b> (ลด vWF/factor VIII และเคลือบเกล็ดเลือด) · ส่วน anaphylactoid reaction พบมากที่สุดใน <b>dextran และ gelatin</b> ไม่ใช่ HES · การกู้ภาวะช็อกใช้ crystalloid เป็น first line ไม่ใช่ albumin · และ colloid <b>เพิ่ม</b> oncotic pressure"
+    },
+    {
+      stem:"ผลข้างเคียงสำคัญของสารน้ำกลุ่ม hydroxyethyl starch (HES) คือข้อใด",
+      opts:["ภาวะน้ำตาลในเลือดสูง","ภาวะไตวายเฉียบพลัน","ภาวะโพแทสเซียมในเลือดสูง","ภาวะเม็ดเลือดแดงแตก"],
+      ans:1,
+      exp:"<b>HES เพิ่มความเสี่ยงต่อ acute kidney injury และการตาย</b> โดยเฉพาะในผู้ป่วย sepsis และผู้ป่วยวิกฤต จนหลายประเทศจำกัดการใช้ · นอกจากนี้ยังทำให้เกิด coagulopathy และอาการคันเรื้อรังจากการสะสมในเนื้อเยื่อ"
+    },
+    {
+      stem:"การให้ HES รบกวนผลการตรวจใดในห้องปฏิบัติการ",
+      opts:["การแปลผล type and screen","การวัดค่า SpO₂ จาก pulse oximeter","การวัดอุณหภูมิแกนกลางของร่างกาย","การแปลผลคลื่นไฟฟ้าหัวใจ"],
+      ans:0,
+      exp:"HES เคลือบผิวเม็ดเลือดแดงจนรบกวนการทำ <b>type and screen / cross-matching</b> ทำให้แปลผลผิดพลาดได้ จึงควรเจาะเลือดส่งตรวจหมู่เลือดและ cross-match <b>ก่อน</b> ให้ HES เสมอ"
+    },
+    {
+      stem:"ข้อใดไม่ถูกต้องเกี่ยวกับสารน้ำกลุ่ม colloid",
+      opts:["Dextran ช่วยลดความหนืดของเลือด","HES ไม่ควรให้เกิน 20 ml/kg ต่อวัน","5% albumin มีค่า oncotic pressure ใกล้เคียงพลาสมา","Gelatin เป็นพอลิเมอร์ของกลูโคสขนาดใหญ่"],
+      ans:3,
+      exp:"<b>Gelatin ผลิตจากคอลลาเจนของวัว</b> เป็นพอลิเปปไทด์ ไม่ใช่พอลิเมอร์ของกลูโคส · ส่วน <b>dextran</b> ต่างหากที่เป็นพอลิเมอร์ของกลูโคสและช่วยลดความหนืดของเลือด · ข้ออื่นถูกต้องตามคุณสมบัติของ HES และ albumin"
+    },
+    {
+      stem:"เป้าหมายหลักของการให้สารน้ำแบบ goal-directed fluid therapy คือข้อใด",
+      opts:["หลีกเลี่ยงภาวะน้ำท่วมปอดหลังผ่าตัด","ปัสสาวะออกมากกว่า 0.5 ml/kg/hr","อัตราการเต้นของหัวใจเปลี่ยนแปลงไม่เกิน 20%","มีการขนส่งออกซิเจนไปเลี้ยงเนื้อเยื่อเพียงพอ"],
+      ans:3,
+      exp:"Goal-directed fluid therapy มุ่งให้สารน้ำตามการตอบสนองของ <b>stroke volume / cardiac output</b> เพื่อให้ <b>oxygen delivery ไปเลี้ยงเนื้อเยื่อเพียงพอ</b> ไม่ใช่ให้ตามสูตรตายตัว · ปัสสาวะและชีพจรเป็นเพียงตัวชี้วัดทางอ้อมที่เชื่อถือได้จำกัด"
+    }
+  ]
+},
+{
+  sec:"หมวด 4 · ส่วนประกอบของเลือด",
+  note:"PRC, FFP, platelet, cryoprecipitate และข้อบ่งชี้",
+  qs:[
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับผลของการให้เลือดและส่วนประกอบของเลือด",
+      opts:["PRC 1 unit ทำให้ Hb เพิ่มขึ้น 3 g/dL","Cryoprecipitate 0.1 unit/kg ทำให้ fibrinogen เพิ่มขึ้น 50 mg%","SDP 1 unit ทำให้เกล็ดเลือดเพิ่มขึ้น 5,000–10,000","FFP 10 ml/kg เพิ่มปัจจัยการแข็งตัวของเลือด 30%"],
+      ans:1,
+      exp:"<b>Cryoprecipitate 0.1 unit/kg เพิ่ม fibrinogen ประมาณ 50 mg%</b> · ส่วน PRC 1 unit เพิ่ม Hb ประมาณ <b>1 g/dL</b> (Hct ~3%), SDP (apheresis) 1 unit เพิ่มเกล็ดเลือด <b>30,000–50,000</b> (ที่เพิ่ม 5,000–10,000 คือ random donor platelet) และ FFP 10–15 ml/kg เพิ่มปัจจัยการแข็งตัวประมาณ 20%"
+    },
+    {
+      stem:"Factor ใดไม่พบใน cryoprecipitate",
+      opts:["Fibrinogen","Von Willebrand factor","Factor X","Factor XIII"],
+      ans:2,
+      exp:"Cryoprecipitate ประกอบด้วย <b>fibrinogen, factor VIII, factor XIII, von Willebrand factor และ fibronectin</b> · ไม่มี factor X (รวมถึงไม่มี factor II, VII, IX ซึ่งอยู่ใน FFP หรือ prothrombin complex concentrate)"
+    },
+    {
+      stem:"ข้อใดเป็นข้อบ่งชี้ของการให้ fresh frozen plasma",
+      opts:["แก้ฤทธิ์ warfarin ในผู้ป่วยที่ต้องผ่าตัดฉุกเฉิน","แก้ไขภาวะ hypovolemia ที่ยังไม่เสียเลือด","แก้ไขภาวะ platelet dysfunction จากยา","ลดการเสียเลือดในผู้ป่วยที่มีเลือดออก"],
+      ans:0,
+      exp:"FFP ใช้เมื่อมี <b>ความบกพร่องของปัจจัยการแข็งตัวหลายตัวร่วมกับเลือดออก</b> เช่น การแก้ฤทธิ์ warfarin, DIC, ตับวาย และ massive transfusion · <b>ห้ามใช้เพื่อเพิ่มปริมาตรสารน้ำ</b> เพราะมีความเสี่ยงจากการติดเชื้อและ TRALI โดยไม่จำเป็น"
+    },
+    {
+      stem:"ข้อใดใช้แก้ฤทธิ์ warfarin ได้เร็วที่สุดในผู้ป่วยที่ต้องผ่าตัดฉุกเฉิน",
+      opts:["Vitamin K","Cryoprecipitate","Fresh frozen plasma","Factor VIII concentrate"],
+      ans:2,
+      exp:"<b>FFP</b> ให้ปัจจัยการแข็งตัวที่ขาด (II, VII, IX, X) ทันทีที่ให้ยา จึงเร็วที่สุดในบรรดาตัวเลือกนี้ · <b>Vitamin K ต้องใช้เวลา 6–24 ชั่วโมง</b> จึงเห็นผล เหมาะกับกรณีที่มีเวลา · หากมี prothrombin complex concentrate จะเป็นตัวเลือกที่เร็วและมีปริมาตรน้อยกว่า FFP"
+    },
+    {
+      stem:"ชายอายุ 19 ปี เป็น hemophilia A มาผ่าตัด hernioplasty ขณะผ่าตัดพบเลือดหยุดยาก ควรให้ส่วนประกอบใด",
+      opts:["Platelet concentrate","Fresh frozen plasma","Cryoprecipitate","Packed red cell"],
+      ans:2,
+      exp:"Hemophilia A ขาด <b>factor VIII</b> ซึ่งมีความเข้มข้นสูงใน <b>cryoprecipitate</b> (หรือ factor VIII concentrate ถ้ามี) · FFP มี factor VIII อยู่บ้างแต่เจือจาง ต้องให้ปริมาตรมากจนเสี่ยง volume overload"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับ hemophilia A",
+      opts:["ไม่มีการถ่ายทอดทางพันธุกรรม","มีการลดลงของ factor X","มีค่า PTT ยาวขึ้น","มีจำนวนเกล็ดเลือดลดลง"],
+      ans:2,
+      exp:"Hemophilia A ขาด factor VIII ซึ่งอยู่ใน intrinsic pathway → <b>PTT ยาวขึ้น แต่ PT ปกติ และเกล็ดเลือดปกติ</b> · เป็นโรคทางพันธุกรรมแบบ X-linked recessive จึงพบในเพศชายเป็นหลัก"
+    },
+    {
+      stem:"ค่าเกล็ดเลือดที่ถือว่าปลอดภัยสำหรับการผ่าตัดตาคือข้อใด",
+      opts:["50,000 /mm³","80,000 /mm³","100,000 /mm³","120,000 /mm³"],
+      ans:2,
+      exp:"การผ่าตัดในบริเวณที่เลือดออกแล้วเกิดอันตรายสูง เช่น <b>ตาและระบบประสาท ต้องการเกล็ดเลือด ≥ 100,000</b> · ผ่าตัดทั่วไปต้องการ ≥ 50,000 และการทำ neuraxial block ส่วนใหญ่ยอมรับที่ ≥ 80,000–100,000"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับการให้ platelet transfusion",
+      opts:["ควรอุ่นก่อนให้เพื่อป้องกันภาวะอุณหภูมิกายต่ำ","หากยังไม่ได้ใช้ควรนำไปเก็บไว้ในตู้เย็น","ปริมาณที่เหมาะสมคือ 1 unit ต่อน้ำหนักตัว 10 กิโลกรัม","ควรให้จนระดับเกล็ดเลือดมากกว่า 100,000 ก่อนผ่าตัดทุกราย"],
+      ans:2,
+      exp:"ขนาดที่ใช้ทั่วไปคือ <b>random donor platelet 1 unit ต่อน้ำหนักตัว 10 kg</b> · เกล็ดเลือดต้องเก็บที่ <b>อุณหภูมิห้อง (20–24°C) พร้อมเขย่าตลอดเวลา ห้ามแช่ตู้เย็นและห้ามอุ่น</b> เพราะจะทำให้เกล็ดเลือดเสียหน้าที่"
+    }
+  ]
+},
+{
+  sec:"หมวด 5 · ความเข้ากันได้ของหมู่เลือด",
+  note:"การเลือกส่วนประกอบของเลือดเมื่อไม่ตรงหมู่",
+  qs:[
+    {
+      stem:"ผู้ป่วยหมู่เลือด O สามารถรับส่วนประกอบของเลือดในข้อใดได้",
+      opts:["FFP หมู่ A","PRC หมู่ B","Whole blood หมู่ B","PRC หมู่ AB"],
+      ans:0,
+      exp:"ผู้ป่วยหมู่ O มีแอนติบอดี anti-A และ anti-B แต่เม็ดเลือดแดงไม่มีแอนติเจน → <b>รับ PRC ได้เฉพาะหมู่ O</b> แต่ <b>รับพลาสมา (FFP) ได้จากทุกหมู่</b> เพราะไม่มีแอนติเจนให้แอนติบอดีในพลาสมาผู้บริจาคไปจับ · หลักการของ FFP จึงตรงข้ามกับ PRC"
+    },
+    {
+      stem:"ผู้ป่วยอุบัติเหตุได้รับ whole blood หมู่ O Rh negative จากห้องฉุกเฉิน ต่อมาตรวจพบว่าเป็นหมู่ A Rh positive ควรให้เลือดต่ออย่างไร",
+      opts:["Whole blood หมู่ O Rh negative","PRC หมู่ O Rh positive","PRC หมู่ A Rh positive","PRC หมู่ O Rh negative"],
+      ans:2,
+      exp:"เมื่อทราบหมู่เลือดที่แท้จริงแล้วควรเปลี่ยนมาให้ <b>PRC ตรงหมู่ (A Rh positive)</b> เพื่อสงวนเลือดหมู่ O negative ซึ่งเป็นทรัพยากรที่มีจำกัด · การให้ PRC ตรงหมู่ทำได้ปลอดภัยเพราะ PRC มีพลาสมาตกค้างน้อยมาก"
+    },
+    {
+      stem:"ผู้ป่วยหมู่ A Rh positive ที่กิน warfarin ต้องการ FFP แต่ FFP หมู่ A หมด ควรให้อะไรทดแทน",
+      opts:["FFP หมู่ AB Rh positive","FFP หมู่ O Rh negative","FFP หมู่ O Rh positive","Cryoprecipitate หมู่ A Rh positive"],
+      ans:0,
+      exp:"<b>FFP หมู่ AB เป็น universal plasma donor</b> เพราะไม่มีทั้ง anti-A และ anti-B จึงให้ผู้ป่วยหมู่ใดก็ได้ · ตรงข้ามกับ FFP หมู่ O ที่มีทั้ง anti-A และ anti-B จะทำลายเม็ดเลือดแดงหมู่ A ของผู้ป่วย"
+    },
+    {
+      stem:"ข้อใดไม่ถูกต้องเกี่ยวกับการให้เลือด",
+      opts:["Whole blood ต้องให้ตรงหมู่เท่านั้น","FFP ที่ไม่ตรงหมู่ไม่สามารถให้ได้ในทุกกรณี","PRC หมู่ O ให้ผู้ป่วยหมู่ A ได้","PRC หมู่ B ให้ผู้ป่วยหมู่ AB ได้"],
+      ans:1,
+      exp:"<b>FFP ที่ไม่ตรงหมู่ให้ได้</b> หากเข้ากันได้ตามหลักพลาสมา เช่น FFP หมู่ AB ให้ได้ทุกหมู่ และ FFP หมู่ A ให้ผู้ป่วยหมู่ O ได้ · ส่วน whole blood ที่มีทั้งเม็ดเลือดแดงและพลาสมาต้องตรงหมู่, PRC หมู่ O เป็น universal donor และหมู่ AB เป็น universal recipient"
+    },
+    {
+      stem:"อาการใดไม่ใช่อาการของการให้เลือดผิดหมู่",
+      opts:["ไข้สูง","ปัสสาวะเป็นสีเข้มจากฮีโมโกลบิน","ความดันโลหิตต่ำ","หัวใจเต้นช้า"],
+      ans:3,
+      exp:"Acute hemolytic transfusion reaction ทำให้เกิด <b>ไข้ หนาวสั่น ปวดหลัง/บั้นเอว ความดันตก หัวใจเต้นเร็ว ปัสสาวะสีเข้ม (hemoglobinuria) และเลือดออกผิดปกติจาก DIC</b> · <b>หัวใจเต้นช้า</b>ไม่ใช่ลักษณะของภาวะนี้ · การจัดการคือหยุดให้เลือดทันที ให้สารน้ำ และรักษาการทำงานของไต"
+    }
+  ]
+},
+{
+  sec:"หมวด 6 · Massive Transfusion &amp; ภาวะแทรกซ้อน",
+  note:"นิยาม ผลทางเมตาบอลิก และการวินิจฉัยปฏิกิริยาจากการให้เลือด",
+  qs:[
+    {
+      stem:"ข้อใดหมายถึงภาวะ massive blood loss",
+      opts:["เสียเลือดมากกว่า 1 blood volume ใน 48 ชั่วโมง","เสียเลือดมากกว่า 50% ของ blood volume ใน 24 ชั่วโมง","อัตราการเสียเลือดมากกว่า 100 ml ต่อนาที","อัตราการเสียเลือดมากกว่า 150 ml ต่อนาที"],
+      ans:3,
+      exp:"นิยามที่ใช้กันได้แก่ <b>เสียเลือด ≥ 1 blood volume ใน 24 ชั่วโมง, เสีย 50% ของ blood volume ใน 3–4 ชั่วโมง หรืออัตราการเสียเลือด &gt; 150 ml/min</b> · ข้อที่ตรงกับนิยามในตัวเลือกนี้คืออัตรามากกว่า 150 ml ต่อนาที"
+    },
+    {
+      stem:"ภาวะแทรกซ้อนใดพบบ่อยที่สุดในผู้ป่วยอุบัติเหตุที่ได้รับ massive blood transfusion",
+      opts:["ภาวะอุณหภูมิกายต่ำ","ภาวะเลือดเป็นด่างจากการหายใจ","ภาวะแพ้รุนแรง","ภาวะแคลเซียมในเลือดสูง"],
+      ans:0,
+      exp:"<b>Hypothermia</b> พบบ่อยที่สุด เพราะเลือดเก็บที่ 1–6°C การให้ปริมาณมากอย่างรวดเร็วโดยไม่อุ่นทำให้อุณหภูมิกายลดลง ซึ่งซ้ำเติม coagulopathy และ acidosis กลายเป็น lethal triad · ป้องกันด้วย fluid warmer และผ้าห่มลมอุ่น"
+    },
+    {
+      stem:"ข้อใดไม่เกิดขึ้นจากการให้เลือดปริมาณมาก",
+      opts:["Hypothermia","Hyperkalemia","Hypercalcemia","Coagulopathy"],
+      ans:2,
+      exp:"การให้เลือดปริมาณมากทำให้เกิด <b>hypocalcemia</b> (แคลเซียมต่ำ) เพราะ citrate ที่ใช้กันเลือดแข็งตัวจับกับแคลเซียมอิสระ ไม่ใช่แคลเซียมสูง · ส่วน hypothermia, hyperkalemia (จากโพแทสเซียมที่รั่วออกจากเม็ดเลือดแดงเก่า) และ dilutional coagulopathy ล้วนพบได้จริง"
+    },
+    {
+      stem:"ชายอายุ 51 ปี ได้รับ PRC 8 unit, FFP 4 unit และ platelet 6 unit ตรวจ ABG พบ metabolic alkalosis สาเหตุคือข้อใด",
+      opts:["ยังมีการเสียเลือดอย่างต่อเนื่อง","ได้รับสารน้ำไม่เพียงพอ","ภาวะ hypoventilation ระหว่างผ่าตัด","Citrate ถูกเปลี่ยนเป็น bicarbonate ที่ตับ"],
+      ans:3,
+      exp:"<b>Citrate ในถุงเลือดถูกตับเปลี่ยนเป็น bicarbonate</b> เมื่อให้เลือดปริมาณมากและตับทำงานได้ดี จึงเกิด <b>metabolic alkalosis ตามหลัง</b> · ในทางกลับกัน หากตับทำงานไม่ดีหรือผู้ป่วยตัวเย็น citrate จะสะสมและทำให้เกิด citrate toxicity กับ hypocalcemia แทน"
+    },
+    {
+      stem:"ผู้ป่วยได้รับ packed red cell จำนวนมากอย่างเดียว จะเกิดภาวะใดตามมา",
+      opts:["Dilutional thrombocytopenia","ระดับ factor VIII สูงขึ้น","ระดับ fibrinogen สูงขึ้น","ภาวะโพแทสเซียมในเลือดต่ำ"],
+      ans:0,
+      exp:"PRC แทบไม่มีเกล็ดเลือดและปัจจัยการแข็งตัวที่มีชีวิต การให้จำนวนมากโดยไม่ให้ FFP และ platelet ร่วมด้วยจึงเกิด <b>dilutional thrombocytopenia และระดับ factor V, VIII, fibrinogen ลดลง</b> · จึงเป็นที่มาของการให้ในอัตราส่วน 1:1:1"
+    },
+    {
+      stem:"ข้อใดไม่ใช่องค์ประกอบของ lethal triad ในผู้ป่วยบาดเจ็บรุนแรง",
+      opts:["ภาวะอุณหภูมิกายต่ำ","ภาวะแคลเซียมในเลือดสูง","ภาวะเลือดเป็นกรดจากเมตาบอลิก","ภาวะการแข็งตัวของเลือดผิดปกติ"],
+      ans:1,
+      exp:"Lethal triad = <b>hypothermia + metabolic acidosis + coagulopathy</b> ซึ่งส่งเสริมกันเป็นวงจร · เมื่อรวม <b>hypocalcemia</b> (แคลเซียมต่ำ ไม่ใช่สูง) เข้าไปด้วยจะเรียกว่า lethal diamond ซึ่งเป็นแนวคิดที่ใช้ใน damage control resuscitation"
+    },
+    {
+      stem:"ผู้ป่วย ectopic pregnancy rupture ได้รับ PRC 4 unit และ FFP 4 unit หลังผ่าตัด BP 70/40 mmHg HR 120 ครั้ง/นาที กระสับกระส่าย ปวดบั้นเอว อุณหภูมิ 38°C ปัสสาวะสีเข้ม เกิดจากภาวะใด",
+      opts:["ปฏิกิริยาแพ้ยาระงับความรู้สึก","ภาวะ anaphylactic shock","ภาวะ ABO incompatibility","ผลข้างเคียงปกติจาก massive transfusion"],
+      ans:2,
+      exp:"อาการครบชุดของ <b>acute hemolytic transfusion reaction จากการให้เลือดผิดหมู่</b> ได้แก่ ไข้ ปวดบั้นเอว ความดันตก ชีพจรเร็ว และปัสสาวะสีเข้มจาก hemoglobinuria · ต้อง<b>หยุดให้เลือดทันที</b> ส่งถุงเลือดตรวจซ้ำ ให้สารน้ำและรักษาปริมาณปัสสาวะเพื่อป้องกันไตวาย"
+    },
+    {
+      stem:"อาการใดไม่ใช่ลักษณะของ hemolytic transfusion reaction",
+      opts:["ความดันโลหิตต่ำ","เลือดซึมผิดปกติตามแผลผ่าตัด","ปัสสาวะมีฮีโมโกลบินปน","หลอดลมหดเกร็ง"],
+      ans:3,
+      exp:"<b>Bronchospasm เป็นลักษณะของ allergic/anaphylactic transfusion reaction</b> ไม่ใช่ hemolytic reaction · ส่วนความดันตก, เลือดซึม (จาก DIC) และ hemoglobinuria ล้วนเป็นอาการของการทำลายเม็ดเลือดแดงเฉียบพลัน"
+    }
+  ]
+},
+{
+  sec:"หมวด 7 · สถานการณ์ทางคลินิก",
+  note:"การประเมินภาวะขาดน้ำ TURP syndrome และการตัดสินใจให้สารน้ำ",
+  qs:[
+    {
+      stem:"ผู้ป่วยผ่าตัด abdominal aortic aneurysm เสียเลือดมาก ได้รับ PRC 6 unit อย่างรวดเร็ว ต่อมาพบเลือดซึมตามตำแหน่งที่แทงเข็มและบริเวณผ่าตัด ควรให้สิ่งใด",
+      opts:["PRC 4 unit และ 5% albumin 50 ml","FFP 1,000 ml และ platelet concentrate","Tranexamic acid 1 g และ vitamin K 10 mg","10% calcium gluconate 30 ml"],
+      ans:1,
+      exp:"ภาพนี้คือ <b>dilutional coagulopathy</b> จากการให้ PRC จำนวนมากโดยไม่ทดแทนปัจจัยการแข็งตัวและเกล็ดเลือด · การรักษาคือให้ <b>FFP และ platelet</b> ตามอัตราส่วนที่เหมาะสม ร่วมกับการตรวจ coagulogram, fibrinogen และการรักษาอุณหภูมิกาย"
+    },
+    {
+      stem:"ข้อใดบ่งบอกถึงภาวะขาดน้ำ",
+      opts:["ค่า pulse pressure กว้างขึ้น","ค่า skin turgor เพิ่มขึ้น","หลอดเลือดดำที่คอโป่งตึง","ค่า specific gravity ของปัสสาวะเพิ่มขึ้น"],
+      ans:3,
+      exp:"ภาวะขาดน้ำทำให้ไตดูดน้ำกลับมากขึ้น ปัสสาวะจึงเข้มข้นและมี <b>specific gravity สูงขึ้น</b> · อาการอื่นที่พบคือ pulse pressure <b>แคบลง</b>, skin turgor <b>ลดลง</b> และหลอดเลือดดำที่คอ<b>แฟบ</b> (ที่โป่งตึงคือภาวะน้ำเกินหรือหัวใจล้มเหลว)"
+    },
+    {
+      stem:"Irrigating fluid ชนิดใดที่ทำให้เกิดภาวะตามัวหรือมองไม่เห็นชั่วคราวได้",
+      opts:["Sterile water","Mannitol","Glycine","Sorbitol"],
+      ans:2,
+      exp:"<b>Glycine</b> เป็นสารสื่อประสาทยับยั้งที่จอตา เมื่อดูดซึมเข้ากระแสเลือดปริมาณมากระหว่างผ่าตัด TURP จะทำให้เกิด <b>transient blindness</b> ซึ่งมักหายเองภายใน 24–48 ชั่วโมง · นอกจากนี้ metabolite ของ glycine คือ ammonia ที่ทำให้ซึมและสับสน"
+    },
+    {
+      stem:"ข้อใดไม่ใช่อาการแสดงของ TURP syndrome",
+      opts:["หัวใจเต้นเร็ว","อาการชัก","ระบบไหลเวียนโลหิตล้มเหลว","ค่า CVP สูงขึ้น"],
+      ans:0,
+      exp:"TURP syndrome เกิดจากการดูดซึม irrigating fluid ที่เป็น hypotonic เข้ากระแสเลือด ทำให้เกิด <b>volume overload และ dilutional hyponatremia</b> → ความดันสูงในระยะแรก <b>ชีพจรช้า (bradycardia)</b> CVP สูง สับสน ชัก และระบบไหลเวียนล้มเหลวในระยะท้าย · ชีพจรเร็วจึงไม่ใช่ลักษณะเด่นของภาวะนี้"
+    },
+    {
+      stem:"ผู้ป่วยหลังผ่าตัด EVAR ได้รับสารน้ำและเลือดปริมาณมาก ย้ายกลับ ICU พบท้องตึงและปัสสาวะไม่ออก ไม่ควรทำสิ่งใด",
+      opts:["เจาะเลือดตรวจค่า hematocrit","ให้สารน้ำเพิ่ม 500 ml ทางหลอดเลือดดำ","ตรวจ ultrasound ไต","วัดความดันในช่องท้อง"],
+      ans:1,
+      exp:"ภาพนี้ชวนให้คิดถึง <b>abdominal compartment syndrome</b> จากการได้สารน้ำปริมาณมาก → ความดันในช่องท้องสูงจนกดการไหลเวียนเลือดที่ไตทำให้ปัสสาวะไม่ออก · <b>การให้สารน้ำเพิ่มจะยิ่งซ้ำเติมภาวะนี้</b> สิ่งที่ควรทำคือวัด intra-abdominal pressure เพื่อยืนยันการวินิจฉัย"
+    }
+  ]
+}
+];
+
+let answered=0, correct=0, totalQ=0;
+let autoSubmitted=false, leftReported=false;
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbylYFUwXHFjob1851FmezQHPk2hQD15q-TGK9O8B-v37us_JhLaT0_8-pK8AaeYfR_Gmw/exec";
+const QUIZ_NAME = "Fluid & Transfusion (45 ข้อ)";
+const KEYS=["ก","ข","ค","ง"];
+const quiz=document.getElementById("quiz");
+
+DATA.forEach((sec,si)=>{
+  const head=document.createElement("div");
+  head.className="section-head";
+  head.innerHTML=`<span class="no">0${si+1}</span><h2>${sec.sec}</h2>`;
+  quiz.appendChild(head);
+  const note=document.createElement("p");
+  note.className="section-note";note.textContent=sec.note;
+  quiz.appendChild(note);
+
+  sec.qs.forEach((q)=>{
+    totalQ++;
+    const n=totalQ;
+    const card=document.createElement("div");
+    card.className="q";
+    const calcHtml=q.calc?`<div class="calc">${q.calc}</div>`:"";
+    card.innerHTML=`
+      <div class="q-top"><span class="qno">Q${n}</span><div class="stem">${q.stem}</div></div>
+      <ul class="opts" data-ans="${q.ans}"></ul>
+      <div class="explain"><span class="tag">เฉลย · คำอธิบาย</span><div class="etext"></div>${calcHtml}</div>`;
+    const ul=card.querySelector(".opts");
+    q.opts.forEach((o,oi)=>{
+      const li=document.createElement("li");
+      li.className="opt";
+      li.innerHTML=`<span class="k">${KEYS[oi]}.</span><span>${o}</span>`;
+      li.addEventListener("click",()=>choose(card,ul,oi,q));
+      ul.appendChild(li);
+    });
+    card.querySelector(".etext").innerHTML=q.exp;
+    quiz.appendChild(card);
+  });
+});
+document.getElementById("total").textContent=totalQ;
+
+function choose(card,ul,oi,q){
+  if(ul.dataset.done)return;
+  ul.dataset.done="1";
+  [...ul.children].forEach((li,i)=>{
+    li.classList.add("locked");
+    if(i===q.ans)li.classList.add("correct");
+    else if(i===oi)li.classList.add("wrong");
+    else li.classList.add("dim");
+  });
+  card.querySelector(".explain").classList.add("show");
+  answered++;
+  if(oi===q.ans)correct++;
+  updateScore();
+}
+function updateScore(){
+  document.getElementById("score").textContent=correct;
+  document.getElementById("answered").textContent=answered;
+  document.getElementById("fill").style.width=(answered/totalQ*100)+"%";
+  if(answered===totalQ && !autoSubmitted){
+    autoSubmitted=true;
+    submitScore();
+  }
+}
+function setStatus(msg,cls){
+  const el=document.getElementById("submitStatus");
+  if(!el) return;
+  el.textContent=msg; el.className="submitstatus"+(cls?(" "+cls):"");
+}
+function buildPayload(){
+  return {
+    name:(document.getElementById("takerName").value||"").trim(),
+    score:correct, total:totalQ, answered:answered,
+    set:QUIZ_NAME,
+    status: answered===totalQ ? "ครบ" : "ไม่ครบ"
+  };
+}
+function submitScore(retry){
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  const p=buildPayload();
+  setStatus("กำลังส่งคะแนน…");
+  fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(p)})
+  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓","ok"); })
+  .catch(()=>{
+    if(!retry){ setTimeout(()=>submitScore(true),1500); return; }
+    setStatus("ส่งคะแนนอัตโนมัติไม่สำเร็จ","err");
+  });
+}
+function reportAbandon(){
+  if(autoSubmitted || leftReported || answered===0) return;
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  leftReported=true;
+  const p=buildPayload();
+  try{ navigator.sendBeacon(SUBMIT_URL, JSON.stringify(p)); }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") reportAbandon(); });
+window.addEventListener("pagehide", reportAbandon);
+function resetQuiz(){
+  answered=0;correct=0;autoSubmitted=false;leftReported=false;
+  document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
+  document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));
+  setStatus("");
+  updateScore();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>

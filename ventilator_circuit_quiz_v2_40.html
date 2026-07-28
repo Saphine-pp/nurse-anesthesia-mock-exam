@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข้อสอบ Ventilator Circuit — 40 ข้อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECF1F1;--panel:#FFFFFF;--ink:#152329;--muted:#57696F;--line:#D0DADA;
+    --teal:#0E7C7B;--teal-soft:#DEEDEC;--signal:#1F9D63;--signal-soft:#E4F4EC;
+    --alert:#C4463A;--alert-soft:#F8E7E5;--ink-panel:#0E1F24;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px;}
+
+  header.hero{background:var(--ink-panel);color:#EAF3F2;padding:26px 18px 22px;position:relative;overflow:hidden;}
+  .hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#5FBFBB;margin:0 0 8px;}
+  .hero h1{font-size:26px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .hero p{margin:0;color:#9DBAB9;font-size:14px;}
+  .badge{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    background:#12332F;color:#7FD8D2;border:1px solid #2E5F58;border-radius:6px;padding:3px 8px;margin-left:8px;vertical-align:middle;}
+  .wave{position:absolute;left:0;right:0;bottom:0;height:46px;width:100%;z-index:1;opacity:.5;}
+
+  .scorebar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 18px;}
+  .scorebar .inner{max-width:820px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .readout{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);}
+  .readout b{color:var(--teal);font-weight:600;}
+  .bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden;max-width:240px;}
+  .bar span{display:block;height:100%;width:0;background:var(--teal);transition:width .4s ease;}
+  .reset{font-family:"IBM Plex Mono",monospace;font-size:12px;background:none;border:1px solid var(--line);
+    color:var(--muted);padding:5px 10px;border-radius:7px;cursor:pointer;}
+  .reset:hover{border-color:var(--teal);color:var(--teal);}
+
+  .section-head{display:flex;align-items:baseline;gap:12px;margin:38px 0 6px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  .section-head .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--teal);font-weight:600;}
+  .section-head h2{font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .section-note{font-size:13px;color:var(--muted);margin:6px 0 16px;}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;margin:0 0 14px;}
+  .q-top{display:flex;gap:11px;align-items:flex-start;}
+  .qno{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;background:var(--teal-soft);color:var(--teal);
+    padding:3px 8px;border-radius:6px;flex:none;margin-top:2px;}
+  .stem{font-size:15.5px;font-weight:500;}
+  .opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px;}
+  .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+    cursor:pointer;font-size:14.5px;background:#fff;transition:border-color .15s,background .15s;}
+  .opt:hover{border-color:var(--teal);background:#FAFDFD;}
+  .opt .k{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--muted);flex:none;}
+  .opt.correct{background:var(--signal-soft);border-color:var(--signal);}
+  .opt.correct .k{color:var(--signal);}
+  .opt.wrong{background:var(--alert-soft);border-color:var(--alert);}
+  .opt.wrong .k{color:var(--alert);}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:.55;}
+
+  .explain{margin-top:12px;border-left:3px solid var(--teal);background:#F5FAFA;border-radius:0 8px 8px 0;
+    padding:11px 13px;font-size:14px;color:#25424A;display:none;}
+  .explain.show{display:block;}
+  .explain .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--teal);display:block;margin-bottom:4px;}
+  .explain b{color:var(--ink);}
+  .calc{margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:#0E1F24;color:#B9E4DF;
+    padding:9px 11px;border-radius:7px;white-space:pre-wrap;line-height:1.5;}
+
+  footer{margin-top:44px;text-align:center;color:var(--muted);font-size:12.5px;}
+  footer .mono{font-size:11px;letter-spacing:.1em;}
+
+  .namecard{margin:16px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .namecard label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 8px;}
+  .namecard input{width:100%;font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);}
+  .namecard input:focus{outline:none;border-color:var(--ink);}
+  .submitstatus{margin-top:10px;font-size:13px;min-height:18px;text-align:center;}
+  .submitstatus.ok{color:var(--signal);}
+  .submitstatus.err{color:var(--alert);}
+
+  @media print{
+    .scorebar,.reset,.wave,.namecard,.submitstatus{display:none!important;}
+    body{background:#fff;}
+    header.hero{background:#fff;color:#000;border-bottom:2px solid #000;}
+    .eyebrow{color:#000;}.hero p{color:#333;}.badge{color:#000;border-color:#000;background:#eee;}
+    .explain{display:block!important;}
+    .calc{background:#f0f0f0;color:#000;border:1px solid #999;}
+    .opt.correct{outline:2px solid var(--signal);}
+    .q{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Board Prep · Anesthesia Machine &amp; Breathing Systems</p>
+    <h1>ข้อสอบ Ventilator Circuit<span class="badge">40 ข้อ</span></h1>
+    <p>Breathing systems · CO₂ absorbent · Vaporizer · Oxygen supply · Monitoring · แตะเพื่อดูเฉลย</p>
+  </div>
+  <svg class="wave" viewBox="0 0 820 46" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,34 L120,34 L150,34 Q165,34 170,20 L185,6 Q190,4 196,10 L205,30 Q209,34 220,34 L360,34 L390,34 Q405,34 410,20 L425,6 Q430,4 436,10 L445,30 Q449,34 460,34 L600,34 L630,34 Q645,34 650,20 L665,6 Q670,4 676,10 L685,30 Q689,34 700,34 L820,34"
+      fill="none" stroke="#2E9E6B" stroke-width="2"/>
+  </svg>
+</header>
+
+<div class="wrap">
+  <div class="namecard">
+    <label for="takerName">ชื่อ–นามสกุล ของผู้ทำ (ไม่บังคับ)</label>
+    <input id="takerName" type="text" placeholder="กรอกชื่อก่อนเริ่มทำข้อสอบ หากอยากให้ปรากฏใน Dashboard" maxlength="60" autocomplete="name">
+  </div>
+</div>
+
+<div class="scorebar">
+  <div class="inner">
+    <span class="readout">SCORE <b id="score">0</b>/<span id="answered">0</span> · <span id="total">40</span> ข้อ</span>
+    <div class="bar"><span id="fill"></span></div>
+    <button class="reset" onclick="resetQuiz()">รีเซ็ต</button>
+  </div>
+</div>
+
+<main class="wrap" id="quiz"></main>
+<div class="wrap"><div id="submitStatus" class="submitstatus"></div></div>
+
+<footer class="wrap">
+  <p>ข้อสอบต้นฉบับ เรียบเรียงแนวจากคลังข้อสอบเก่าในโปรเจกต์ — ใช้เพื่อฝึกทบทวนเท่านั้น</p>
+  <p class="mono">VENTILATOR CIRCUIT SET · 40 ITEMS · v2</p>
+</footer>
+
+<script>
+const ANSKEY=[3,2,3,1,2,0,1,1,3,0,1,3,0,1,2,3,2,0,2,1,1,0,1,0,0,3,2,0,2,3,0,2,3,2,0,2,1,3,1,3];
+
+const DATA = [
+{
+  sec:"หมวด 1 · Breathing Systems (Mapleson)",
+  note:"ประสิทธิภาพของแต่ละระบบและการคำนวณ fresh gas flow",
+  qs:[
+    {stem:"ระบบ Mapleson ชนิดใดมีประสิทธิภาพดีที่สุดในผู้ป่วยที่ใช้เครื่องช่วยหายใจแบบแรงดันบวก",
+     opts:["Mapleson A","Mapleson B","Mapleson C","Mapleson D"],ans:3,
+     exp:"<b>Mapleson D</b> (และ Bain ที่เป็น coaxial D) มีประสิทธิภาพดีที่สุดในโหมด controlled ventilation · จำคู่กันว่า <b>A ดีสำหรับ spontaneous, D ดีสำหรับ controlled</b> — Mapleson A ในโหมดช่วยหายใจต้องใช้ FGF สูงมากจึงไม่นิยม"},
+    {stem:"ผู้ป่วยชายน้ำหนัก 60 กิโลกรัม หายใจเองผ่าน Mapleson A ต้องตั้ง fresh gas flow อย่างน้อยประมาณเท่าใดจึงป้องกัน rebreathing (ใช้ alveolar ventilation 70 ml/kg/min)",
+     opts:["2.1 ลิตรต่อนาที","4.2 ลิตรต่อนาที","8.4 ลิตรต่อนาที","12 ลิตรต่อนาที"],ans:1,
+     exp:"Mapleson A ในโหมดหายใจเองต้องการ FGF ประมาณ <b>alveolar minute ventilation</b> เท่านั้น จึงประหยัดแก๊สที่สุด",
+     calc:"FGF ≈ 70 ml/kg/min × 60 kg\n    = 4,200 ml/min = 4.2 L/min\n(โหมด controlled ของ Mapleson A ต้องใช้ ~20 L/min)"},
+    {stem:"Bain circuit จัดอยู่ในระบบ Mapleson ชนิดใด",
+     opts:["Mapleson A แบบ coaxial","Mapleson C แบบ parallel","Mapleson D แบบ coaxial","Mapleson F แบบ T-piece"],ans:2,
+     exp:"Bain เป็น <b>coaxial Mapleson D</b> โดยท่อ fresh gas อยู่ภายในท่อหายใจออก ทำให้ลมหายใจเข้าได้รับความอบอุ่นบางส่วน · จุดอ่อนเฉพาะคือ inner tube หักหรือหลุด ทำให้เกิด dead space และ rebreathing รุนแรง จึงต้องทำ Pethick test ก่อนใช้"},
+    {stem:"ในการใช้ Bain circuit ที่มี ETCO₂ สูงขึ้นเรื่อย ๆ ทั้งที่ตั้ง minute ventilation เท่าเดิม สาเหตุที่จำเพาะต่อ Bain มากที่สุดคือข้อใด",
+     opts:["การหักหรือหลุดของท่อ fresh gas ด้านใน","การปิดสนิทเกินไปของ APL valve","การหมดสภาพของ CO₂ absorbent","การขยายตัวของ reservoir bag"],ans:0,
+     exp:"Bain เป็น coaxial Mapleson D จุดอ่อนเฉพาะคือ <b>inner tube (ท่อ fresh gas ด้านใน) หัก หลุด หรือไม่ต่อ</b> ทำให้ fresh gas ไม่ถูกส่งไปปลายท่อ เกิด dead space ขนาดใหญ่และ rebreathing รุนแรงทั้งที่ภายนอกดูปกติ · Bain ไม่มี absorbent จึงตัดข้อนั้นออกได้"}
+  ]
+},
+{
+  sec:"หมวด 2 · Circle System &amp; CO₂ Absorbent",
+  note:"ส่วนประกอบ การป้องกัน rebreathing และการหมดสภาพของสารดูดซับ",
+  qs:[
+    {stem:"ส่วนประกอบใดของ circle system ป้องกันการหายใจซ้ำก๊าซคาร์บอนไดออกไซด์เป็นหลัก",
+     opts:["APL valve","Reservoir bag","Fresh gas inlet","Unidirectional valves"],ans:3,
+     exp:"<b>Unidirectional (one-way) valves</b> บังคับทิศทางการไหลของแก๊สให้ไปทางเดียว หากลิ้นค้างหรือปิดไม่สนิทจะเกิด rebreathing ทันทีแม้ absorbent ยังดีอยู่ · ส่วน CO₂ absorber ทำหน้าที่กำจัด CO₂ ในแก๊สที่ไหลวนกลับ ไม่ได้ป้องกันทิศทางการไหล"},
+    {stem:"ข้อใดเป็นข้อดีของ circle breathing system เมื่อเทียบกับระบบ open หรือ semi-open",
+     opts:["สงวนความร้อนและความชื้น ลดมลพิษ และประหยัดยาดมสลบ","เพิ่ม dead space เพื่อให้ระบายลมได้ดีขึ้น","ทำให้ค่า inspired concentration เปลี่ยนตาม FGF ทันที","ทำให้ไม่จำเป็นต้องมี CO₂ absorbent"],ans:0,
+     exp:"Circle system <b>สงวนความร้อนและความชื้น ลดมลพิษในห้องผ่าตัด และประหยัดยาดมสลบ/แก๊ส</b> โดยเฉพาะเมื่อทำ low flow · ข้อเสียคือเมื่อ FGF ต่ำ ค่า inspired concentration จะเปลี่ยนช้า (time constant ยาว) ไม่ตอบสนองทันทีเหมือน high flow"},
+    {stem:"สารบ่งชี้ ethyl violet ใน soda lime จะเปลี่ยนสีอย่างไรเมื่อสารดูดซับหมดสภาพ",
+     opts:["ม่วงเปลี่ยนเป็นขาว","ขาวเปลี่ยนเป็นม่วง","เขียวเปลี่ยนเป็นเหลือง","ชมพูเปลี่ยนเป็นน้ำเงิน"],ans:1,
+     exp:"เมื่อ pH ลดลงจากการดูดซับ CO₂ indicator จะเปลี่ยนจาก<b>สีขาวเป็นสีม่วง</b> · ข้อควรระวังคือสีอาจ<b>จางกลับ (regeneration)</b> เมื่อพักไว้ ทำให้ดูเหมือนยังใช้ได้ทั้งที่หมดแล้ว จึงต้องยืนยันด้วยค่า inspired CO₂ บน capnography เสมอ"},
+    {stem:"ผู้ป่วยทำ low flow anesthesia พบ inspired CO₂ ค่อย ๆ สูงขึ้นโดย minute ventilation คงที่และ leak test ปกติ absorbent เริ่มเปลี่ยนสี ควรจัดการอย่างไร",
+     opts:["ให้ dantrolene เพราะสงสัย malignant hyperthermia","ลด fresh gas flow ลงอีกเพื่อสงวนแก๊ส","เพิ่มอัตราการหายใจเพียงอย่างเดียว","เพิ่ม fresh gas flow ชั่วคราวและเปลี่ยน CO₂ absorbent"],ans:3,
+     exp:"อาการ inspired CO₂ สูงขึ้นทั้งที่ MV เท่าเดิม = rebreathing จาก <b>CO₂ absorbent หมดสภาพ</b> · แก้เฉพาะหน้าด้วยการ<b>เพิ่ม FGF เป็น high flow เพื่อไล่ CO₂</b> แล้วเปลี่ยน absorbent · หากเป็น MH จะพบ ETCO₂ พุ่งพร้อมอุณหภูมิสูงและชีพจรเร็ว"},
+    {stem:"ยาดมสลบชนิดใดเมื่อสัมผัส CO₂ absorbent ที่แห้งมากแล้วเสี่ยงเกิด Compound A มากที่สุด",
+     opts:["Nitrous oxide","Sevoflurane","Halothane","Isoflurane"],ans:1,
+     exp:"<b>Sevoflurane กับ absorbent ที่แห้ง</b> (โดยเฉพาะ Baralyme เก่า) เกิด <b>Compound A</b> ซึ่งมีพิษต่อไตในสัตว์ทดลอง พร้อมความร้อนสูง · ส่วน desflurane, enflurane และ isoflurane กับ absorbent แห้งจะเกิด carbon monoxide"},
+    {stem:"เช้าวันจันทร์พบผู้ป่วยรายแรกมีระดับ carboxyhemoglobin สูงผิดปกติ หลังเครื่องดมยาถูกเปิด fresh gas flow ค้างไว้ตลอดสุดสัปดาห์ สาเหตุคือข้อใด",
+     opts:["ปฏิกิริยาระหว่างยาดมสลบกับ CO₂ absorbent ที่แห้ง","การรั่วของแก๊สจากระบบ scavenging","การสลายตัวของยาด้วยความร้อนจาก vaporizer","การปนเปื้อนของแก๊สในระบบ pipeline"],ans:0,
+     exp:"CO₂ absorbent ที่<b>แห้ง (desiccated)</b> จากการเปิด FGF ค้างไว้นาน ทำปฏิกิริยากับยาที่มีหมู่ CHF₂ (<b>desflurane &gt; enflurane &gt; isoflurane</b>) เกิด <b>carbon monoxide</b> · ป้องกันโดยปิด FGF เมื่อเลิกใช้และเปลี่ยน absorbent เมื่อสงสัยว่าแห้ง"}
+  ]
+},
+{
+  sec:"หมวด 3 · Ventilator Modes &amp; Mechanics",
+  note:"โหมดเครื่องช่วยหายใจ ผลของ PEEP และการปรับตามพยาธิสภาพ",
+  qs:[
+    {stem:"ข้อใดถูกต้องเกี่ยวกับความแตกต่างระหว่างโหมด volume-controlled และ pressure-controlled",
+     opts:["VC คงแรงดันสูงสุด ส่วน PC คง tidal volume","VC คง tidal volume ส่วน PC คงแรงดันสูงสุด","ทั้งสองโหมดคงทั้งปริมาตรและแรงดันเท่ากัน","PC ใช้ไม่ได้ในผู้ป่วยที่ compliance ต่ำ"],ans:1,
+     exp:"<b>VC</b> กำหนด tidal volume คงที่ แรงดันจึงแปรตาม compliance (compliance แย่ = peak pressure สูงขึ้น) · <b>PC</b> กำหนดแรงดันคงที่ tidal volume จึงแปรตาม compliance (compliance แย่ = TV ลดลง) ต้องเฝ้าระวัง hypoventilation"},
+    {stem:"ผู้ป่วยโหมด pressure control ตั้ง driving pressure เหนือ PEEP 15 cmH₂O ได้ tidal volume 450 ml ต่อมา compliance ลดจาก 30 เหลือ 20 ml/cmH₂O โดยตั้งค่าเครื่องเท่าเดิม tidal volume ใหม่ประมาณเท่าใด",
+     opts:["ประมาณ 450 ml","ประมาณ 600 ml","ประมาณ 300 ml","ประมาณ 200 ml"],ans:2,
+     exp:"ในโหมด <b>PC เครื่องคงแรงดัน → TV แปรตาม compliance</b> เมื่อ compliance ลดลง TV จะลดลงตาม ต้องเฝ้าระวัง hypoventilation",
+     calc:"C = TV / driving pressure = 450 / 15 = 30 ✓\nTV ใหม่ = C ใหม่ × driving pressure\n        = 20 × 15 = 300 ml"},
+    {stem:"ผลของการตั้ง PEEP สูงต่อระบบไหลเวียนเลือดคือข้อใด",
+     opts:["เพิ่ม venous return และ cardiac output","ลด venous return ทำให้ preload และความดันลดลง","ลดความดันในช่องอกลง","ไม่มีผลต่อระบบไหลเวียนเลือด"],ans:1,
+     exp:"PEEP เพิ่ม <b>intrathoracic pressure</b> กด vena cava ทำให้ <b>venous return ลดลง → preload, cardiac output และความดันลดลง</b> โดยเฉพาะในผู้ป่วย hypovolemia · ประโยชน์ของ PEEP คือเพิ่ม FRC และแก้ atelectasis จึงต้องชั่งน้ำหนักสองด้าน"},
+    {stem:"ผู้ป่วย COPD มีภาวะ air trapping ควรปรับเครื่องช่วยหายใจอย่างไร",
+     opts:["เพิ่มอัตราการหายใจเป็น 24 ครั้งต่อนาที","เพิ่ม tidal volume เป็น 10 ml/kg","ลดอัตราการหายใจและยืดเวลาหายใจออก","เพิ่ม PEEP ให้สูงขึ้นทันที"],ans:2,
+     exp:"ภาวะ obstructive เสี่ยง <b>air trapping และ auto-PEEP</b> จึงต้อง<b>ลดอัตราการหายใจและยืดเวลาหายใจออก</b> (I:E 1:3–1:4) ให้ปอดระบายลมออกได้หมดก่อนรอบถัดไป · การเพิ่ม RR หรือ TV จะยิ่งทำให้ trapping แย่ลงและเสี่ยง barotrauma"},
+    {stem:"ผู้ป่วย asthma เกิดความดันตกเฉียบพลันหลังตั้งอัตราการหายใจสูงขึ้น สงสัย dynamic hyperinflation ขั้นตอนแรกที่เหมาะสมที่สุดคือข้อใด",
+     opts:["เพิ่ม PEEP ที่ตั้งให้สูงขึ้น","เพิ่ม tidal volume เพื่อดันความดันขึ้น","ให้ vasopressor แล้วคงค่าเครื่องเดิม","ปลดผู้ป่วยออกจากเครื่องชั่วครู่เพื่อให้ปอดระบายลมออก"],ans:3,
+     exp:"Auto-PEEP จาก air trapping → intrathoracic pressure สูง → venous return ตก → ความดันตก · แก้เฉพาะหน้าด้วยการ<b>ปลดวงจรให้ปอดคายลมออกให้หมด</b> ความดันมักดีขึ้นทันที จากนั้นลด RR และยืดเวลาหายใจออก · การเพิ่ม RR/TV จะยิ่งเติม trapping"}
+  ]
+},
+{
+  sec:"หมวด 4 · Capnography &amp; Troubleshooting",
+  note:"การแปลรูปคลื่นและการไล่หาสาเหตุปัญหาของวงจร",
+  qs:[
+    {stem:"ค่า ETCO₂ ที่ตกลงสู่ศูนย์ทันทีเข้าได้กับภาวะใดน้อยที่สุด",
+     opts:["Circuit disconnection","การอุดกั้นท่อช่วยหายใจอย่างสมบูรณ์","การรั่วของ cuff เพียงเล็กน้อย","ภาวะหัวใจหยุดเต้น"],ans:2,
+     exp:"ETCO₂ ที่ตกเป็นศูนย์ทันทีหมายถึงไม่มีแก๊สผ่าน sensor เลย เข้าได้กับ disconnection, การอุดกั้นสมบูรณ์, esophageal intubation และภาวะไม่มี cardiac output · <b>cuff รั่วเล็กน้อย</b>ทำให้ค่าลดลงบางส่วนและรูปคลื่นผิดรูป ไม่ใช่ตกเป็นศูนย์"},
+    {stem:"Capnography แสดง baseline ที่ไม่กลับสู่ศูนย์ โดยเพิ่งเปลี่ยน absorbent ใหม่และ leak test ปกติ สาเหตุใดเป็นไปได้มากที่สุด",
+     opts:["ลิ้นหายใจออกปิดไม่สนิท","สารดูดซับหมดสภาพ","การหายใจเร็วเกินไป","สาย sampling line อุดตัน"],ans:0,
+     exp:"Baseline ที่ยกสูงหมายถึง rebreathing ซึ่งเกิดได้จาก absorbent หมด <b>หรือ</b> unidirectional valve ทำงานผิดปกติ · เมื่อ absorbent เพิ่งเปลี่ยนและ leak test ปกติ ตัวการที่เหลือคือ <b>incompetent expiratory valve</b> ที่ปล่อยให้ลมหายใจออกไหลย้อน"},
+    {stem:"ระหว่างจัดท่าผู้ป่วย มี ETCO₂ ค่อย ๆ ลดลงพร้อมความดันตก โดยรูปคลื่นยังเป็นสี่เหลี่ยมคางหมูสมบูรณ์แต่ความสูงลดลง ควรนึกถึงภาวะใดมากที่สุด",
+     opts:["Severe bronchospasm","Partial extubation","การลดลงของ cardiac output หรือ pulmonary perfusion","Malignant hyperthermia"],ans:2,
+     exp:"รูปคลื่น<b>รูปร่างปกติแต่เตี้ยลงพร้อมความดันตก</b> = การส่ง CO₂ ไปปอดลดลง สะท้อน <b>cardiac output หรือ pulmonary perfusion ที่ลดลง</b> (เช่น venous air embolism, hypovolemia) · ต่างจาก bronchospasm ที่ upslope ชัน และ MH ที่ ETCO₂ สูงขึ้น"},
+    {stem:"เครื่องเตือน High Peak Airway Pressure พร้อม tidal volume ลดลงมาก สิ่งแรกที่ควรทำเพื่อแยกว่าปัญหาอยู่ที่ผู้ป่วยหรือเครื่องคือข้อใด",
+     opts:["พ่นยาขยายหลอดลมทันที","เปลี่ยนมาบีบ manual เพื่อประเมินความยืดหยุ่นของปอด","เพิ่มขีดจำกัดแรงดันบนหน้าจอ","ถอดท่อช่วยหายใจออกทันที"],ans:1,
+     exp:"หลักการคือ <b>ตัดเครื่องออกแล้วบีบ manual</b> — ถ้าบีบแล้วฝืด ปัญหาอยู่ที่ผู้ป่วยหรือท่อ (bronchospasm, kinking, เสมหะ) ถ้าบีบแล้วไหลสะดวก ปัญหาอยู่ที่เครื่องหรือวงจร · การเพิ่ม pressure limit หรือพ่นยาโดยยังไม่วินิจฉัยเป็นการรักษาแบบเดา"},
+    {stem:"ผู้ป่วยใส่ท่อช่วยหายใจอยู่ เครื่องเตือน High Airway Pressure ขึ้นทันที สาเหตุใดเป็นไปได้มากที่สุด",
+     opts:["การพับงอของท่อช่วยหายใจ","การหลุดของข้อต่อในวงจร","การรั่วของ cuff ท่อช่วยหายใจ","การหลุดของสาย sampling line"],ans:0,
+     exp:"แรงดันสูงเฉียบพลันบ่งถึงการอุดกั้นทางไหลของแก๊ส เช่น <b>ท่อพับงอ ผู้ป่วยกัดท่อ เสมหะอุด หรือ bronchospasm</b> · ในทางกลับกัน การหลุดของข้อต่อและ cuff รั่วจะทำให้แรงดัน<b>ต่ำ</b> (Low pressure alarm)"},
+    {stem:"ผู้ป่วย low flow FGF 0.4 ลิตรต่อนาที เปิด desflurane 6% แต่หน้าจอวัดได้เพียง 3% โดยไม่มีการรั่วของวงจร สาเหตุที่เป็นไปได้มากที่สุดคือข้อใด",
+     opts:["Soda lime ดูดซับ desflurane มากเกินไป","เครื่องระเหยยาทำงานผิดปกติ","FGF ต่ำเกินไปทำให้ wash-in ของยาช้า","ผู้ป่วยเมตาบอไลซ์ยาเร็วผิดปกติ"],ans:2,
+     exp:"เมื่อ <b>FGF ต่ำมาก</b> ความเข้มข้นที่ผู้ป่วยได้รับจริงถูกกำหนดโดยแก๊สที่ไหลวนในวงจร ไม่ใช่ค่าที่ตั้งบน vaporizer → <b>wash-in ช้า</b> ค่าจริงจึงต่ำกว่าที่ตั้ง (dial-delivered mismatch) · การแก้คือเพิ่ม FGF ให้ค่าจริงไล่ทันค่าที่ตั้ง"}
+  ]
+},
+{
+  sec:"หมวด 5 · Vaporizer",
+  note:"หลักการทำงานและผลของสภาพแวดล้อมต่อการจ่ายยา",
+  qs:[
+    {stem:"เมื่อนำ variable-bypass vaporizer ไปใช้ในพื้นที่สูง จะเกิดผลอย่างไร",
+     opts:["ความเข้มข้นเชิงปริมาตรลดลงและ partial pressure ลดลงตามกัน","ความเข้มข้นเชิงปริมาตรสูงขึ้น แต่ partial pressure ใกล้เคียงค่าที่ตั้ง","ความเข้มข้นเชิงปริมาตรและ partial pressure สูงขึ้นทั้งคู่","ความเข้มข้นเชิงปริมาตรและ partial pressure ไม่เปลี่ยนแปลง"],ans:1,
+     exp:"ที่ความดันบรรยากาศต่ำ vaporizer จ่ายยาที่<b>เปอร์เซ็นต์ปริมาตรสูงขึ้น แต่ partial pressure ซึ่งเป็นตัวกำหนดฤทธิ์จริงใกล้เคียงค่าที่ตั้งไว้</b> จึงไม่ต้องปรับ dial · ยกเว้น desflurane vaporizer ที่ควบคุมความดันโดยตรง ต้องปรับเพิ่มเมื่ออยู่ที่สูง"},
+    {stem:"Pumping effect จากการช่วยหายใจด้วยแรงดันบวกหรือการกด oxygen flush ส่งผลต่อ vaporizer อย่างไร",
+     opts:["จ่ายยาเข้มข้นสูงกว่าค่าที่ตั้งไว้","จ่ายยาเข้มข้นต่ำกว่าค่าที่ตั้งไว้","หยุดจ่ายยาชั่วคราวจนความดันคงที่","จ่ายยาคงที่เท่ากับค่าที่ตั้งเสมอ"],ans:0,
+     exp:"<b>Pumping effect</b>: ความดันย้อนกลับดันแก๊สเข้าห้องระเหยยา เมื่อความดันลด แก๊สอิ่มตัวจะไหลย้อนออกมา ทำให้<b>ความเข้มข้นที่จ่ายจริงสูงกว่าที่ตั้ง</b> โดยเฉพาะเมื่อ FGF ต่ำและระดับยาในห้องระเหยเหลือน้อย · vaporizer รุ่นใหม่ออกแบบให้ลดผลนี้แล้ว"},
+    {stem:"เหตุใด desflurane จึงต้องใช้ vaporizer ชนิดพิเศษที่ให้ความร้อนและควบคุมความดัน",
+     opts:["เพราะมีค่า MAC สูงกว่ายาชนิดอื่น","เพราะละลายในเลือดได้น้อยที่สุด","เพราะมีจุดเดือดใกล้เคียงอุณหภูมิห้อง","เพราะสลายตัวเมื่อสัมผัส CO₂ absorbent"],ans:2,
+     exp:"Desflurane มี<b>จุดเดือดประมาณ 22.8°C</b> ใกล้อุณหภูมิห้องและมี vapor pressure สูงมาก จึงเดือดได้เองที่อุณหภูมิห้อง ต้องใช้ vaporizer ที่<b>อุ่นถึง ~39°C และปรับความดันเป็น 2 บรรยากาศ</b> · ค่า blood:gas ต่ำเป็นเหตุผลที่ฟื้นเร็ว ไม่ใช่เหตุผลของ vaporizer พิเศษ"},
+    {stem:"ข้อใดถูกต้องเกี่ยวกับผลของ fresh gas flow ที่เปลี่ยนไปต่อการจ่ายยาของ variable-bypass vaporizer",
+     opts:["ค่าที่จ่ายจริงเพิ่มขึ้นชัดเจนเมื่อ FGF สูงมาก","ค่าที่จ่ายจริงค่อนข้างคงที่ในช่วง flow ที่ใช้งานปกติ","ค่าที่จ่ายจริงลดลงครึ่งหนึ่งเมื่อ FGF เพิ่มเป็นสองเท่า","ค่าที่จ่ายจริงไม่ขึ้นกับอุณหภูมิของยา"],ans:1,
+     exp:"Variable-bypass vaporizer ออกแบบให้ค่าที่จ่าย<b>ค่อนข้างคงที่ในช่วง flow ที่ใช้งานปกติ</b> (ประมาณ 0.25–15 L/min) · ที่ flow ต่ำมากหรือสูงมากอาจคลาดเคลื่อน และมีการชดเชยอุณหภูมิในตัว (temperature compensation) เพราะการระเหยยาขึ้นกับอุณหภูมิ"}
+  ]
+},
+{
+  sec:"หมวด 6 · Oxygen Supply &amp; Safety Systems",
+  note:"ถังแก๊ส ระบบความปลอดภัย และการจัดการเหตุฉุกเฉินของแหล่งจ่าย",
+  qs:[
+    {stem:"ถัง O₂ ชนิด E เต็มที่ความดัน 1,900 psi บรรจุ 660 ลิตร ขณะนี้เกจอ่านได้ 1,100 psi เปิด flow 7 ลิตรต่อนาที จะใช้ได้อีกประมาณกี่นาที",
+     opts:["45 นาที","65 นาที","95 นาที","55 นาที"],ans:3,
+     exp:"ออกซิเจนในถังเป็นแก๊สอัดที่ไม่มีสถานะของเหลว ปริมาตรจึง<b>แปรผันตรงกับความดัน</b> ต่างจาก N₂O ที่เป็นของเหลว เกจจะไม่ลดลงจนกว่าของเหลวจะหมด",
+     calc:"V คงเหลือ = 660 × (1100 / 1900) ≈ 382 L\nเวลา = 382 / 7 ≈ 54.6 นาที ≈ 55 นาที"},
+    {stem:"อุปกรณ์ใดตรวจจับภาวะ hypoxic gas mixture ที่ปลายทางได้โดยตรง",
+     opts:["Oxygen analyzer","Fail-safe valve","Second-stage pressure regulator","Pin index safety system"],ans:0,
+     exp:"<b>Oxygen analyzer</b> วัดความเข้มข้นออกซิเจนจริงในแก๊สที่ไหลถึงผู้ป่วย จึงเป็นด่านสุดท้ายที่ตรวจจับ hypoxic mixture ได้โดยตรง · fail-safe/hypoxic guard/PISS เป็นระบบป้องกันเชิงกลไกที่ต้นทาง แต่ไม่ได้วัดความเข้มข้นจริงที่ปลายทาง"},
+    {stem:"ข้อใดถูกต้องที่สุดเกี่ยวกับขอบเขตของ fail-safe valve",
+     opts:["ป้องกันการจ่าย hypoxic mixture ได้ในทุกกรณี","วัดความเข้มข้นออกซิเจนที่ถึงผู้ป่วยได้โดยตรง","อาศัยความดันออกซิเจน จึงไม่ป้องกันหากตั้ง flowmeter ออกซิเจนต่ำเอง","ทำหน้าที่เดียวกับ pin index safety system"],ans:2,
+     exp:"<b>Fail-safe อาศัย 'ความดัน' ออกซิเจน</b> — หากความดันปกติแต่ผู้ใช้ตั้ง flowmeter ออกซิเจนต่ำเอง ก็ยังจ่าย hypoxic mixture ได้ · การกันสัดส่วนต้องใช้ hypoxic guard/proportioning system และยืนยันด้วย oxygen analyzer ซึ่งเป็นด่านสุดท้าย"},
+    {stem:"ระบบใดป้องกันการต่อถังแก๊สผิดชนิดเข้ากับ yoke ของเครื่องดมยา",
+     opts:["Diameter index safety system","Pin index safety system","Fail-safe valve","Oxygen ratio proportioning system"],ans:1,
+     exp:"<b>Pin index safety system (PISS)</b> ใช้ตำแหน่งหมุดที่แตกต่างกันของถังแก๊สแต่ละชนิดกันการต่อถังผิดเข้ากับ yoke · ส่วน <b>DISS (diameter index)</b> ใช้กับข้อต่อของระบบ pipeline และ oxygen ratio proportioning system กันการจ่ายสัดส่วน O₂ ต่ำเกินไป"},
+    {stem:"สงสัยว่ามี pipeline crossover ทำให้มี N₂O ปนในสายออกซิเจน การจัดการลำดับแรกที่ปลอดภัยที่สุดคือข้อใด",
+     opts:["เชื่อค่า FiO₂ ที่ตั้งไว้แล้วผ่าตัดต่อ","เพิ่ม N₂O เพื่อคงความลึกของยาสลบ","ปิด oxygen analyzer เพราะน่าจะผิดพลาด","เปิดถัง O₂ สำรองและปลดการต่อ pipeline พร้อมยืนยันด้วย oxygen analyzer"],ans:3,
+     exp:"เมื่อสงสัย crossover หรือ pipeline failure ต้อง<b>สลับมาใช้ O₂ cylinder สำรองและปลด pipeline</b> เพื่อตัดต้นตอ แล้ว<b>ยืนยันความเข้มข้น O₂ จริงด้วย oxygen analyzer</b> ซึ่งเป็นด่านเดียวที่วัดค่าจริงที่ถึงผู้ป่วย · ห้ามเชื่อค่าที่ตั้งหรือปิด analyzer ทิ้ง"},
+    {stem:"ข้อใดผิดเกี่ยวกับ oxygen flush valve",
+     opts:["ส่งออกซิเจน 100% เข้า common gas outlet ด้วยอัตรา 35–75 ลิตรต่อนาที","ใช้เติมถุงลมที่แฟบหรือให้ออกซิเจนในภาวะเร่งด่วน","การกดขณะต่อกับผู้ป่วยเสี่ยงต่อ barotrauma และการเจือจางยาดมสลบ","ใช้กดค้างระหว่างช่วยหายใจตามปกติได้โดยไม่มีความเสี่ยง"],ans:3,
+     exp:"ข้อที่ผิดคือการกดค้างระหว่างช่วยหายใจตามปกติ · flush ส่งออกซิเจนอัตราสูงมากและ<b>บายพาส vaporizer</b> จึงเจือจางยาดมสลบเสี่ยง awareness และหากกดขณะวงจรต่อกับผู้ป่วยในจังหวะหายใจเข้าจะเสี่ยง <b>barotrauma</b>"},
+    {stem:"ถัง N₂O ต่างจากถัง O₂ ในการอ่านปริมาณคงเหลือจากเกจความดันอย่างไร",
+     opts:["เกจ N₂O บอกปริมาณคงเหลือได้แม่นยำตลอดเวลา","เกจ N₂O คงที่จนของเหลวเกือบหมดจึงประเมินจากความดันไม่ได้","เกจ N₂O ลดลงเป็นเส้นตรงตามปริมาตรที่ใช้","เกจ N₂O สูงกว่าถัง O₂ ที่ปริมาตรเท่ากัน"],ans:1,
+     exp:"N₂O ในถังอยู่ในสถานะ<b>ของเหลว</b> ความดันจึงคงที่ (~745 psi) ตราบที่ยังมีของเหลวเหลืออยู่ <b>ประเมินปริมาณคงเหลือจากความดันไม่ได้ ต้องชั่งน้ำหนักถัง</b> · ต่างจาก O₂ ที่เป็นแก๊สอัด ความดันแปรผันตรงกับปริมาตร"}
+  ]
+},
+{
+  sec:"หมวด 7 · Filters, Scavenging &amp; Humidification",
+  note:"อุปกรณ์เสริมของวงจรและการควบคุมมลพิษของแก๊ส",
+  qs:[
+    {stem:"Heat and moisture exchanger มีข้อควรระวังในการใช้อย่างไร",
+     opts:["ลดความเข้มข้นออกซิเจนที่ผู้ป่วยได้รับ","เพิ่ม dead space และความต้านทานของวงจร","ทำให้ค่า ETCO₂ อ่านได้ต่ำกว่าจริง","ทำให้ absorbent หมดสภาพเร็วขึ้น"],ans:1,
+     exp:"HME ดักความร้อนและความชื้นจากลมหายใจออกเพื่อคืนให้ลมหายใจเข้า ป้องกันทางเดินหายใจแห้ง · <b>ข้อควรระวังคือเพิ่ม dead space และความต้านทาน</b> โดยเฉพาะในเด็กเล็กและผู้ป่วยที่ tidal volume ต่ำ และหากชื้นจนอุดตันจะเพิ่มแรงต้านมาก"},
+    {stem:"ผู้ป่วยสงสัยวัณโรคมาผ่าตัดฉุกเฉิน มาตรการใดเหมาะสมที่สุดในการป้องกันการปนเปื้อนวงจรดมยา",
+     opts:["ติดตั้ง bacterial/viral filter ระหว่างท่อช่วยหายใจกับวงจร","ไม่ต้องใช้ filter หากใช้ระบบปิด","เพิ่ม fresh gas flow เป็น 10 ลิตรต่อนาที","ใช้ HME ธรรมดาแทน filter ได้เสมอ"],ans:0,
+     exp:"ควรติด <b>bacterial/viral (HEPA-type) filter ระหว่างท่อช่วยหายใจกับวงจร</b> เพื่อดักเชื้อไม่ให้ปนเปื้อนเครื่องและสิ่งแวดล้อม ร่วมกับจัดห้องความดันลบ · HME ธรรมดาไม่รับประกันการกรองเชื้อระดับ HEPA"},
+    {stem:"หน้าที่หลักของระบบ scavenging ในเครื่องดมยาคือข้อใด",
+     opts:["กำจัดแก๊สดมยาส่วนเกินออกจากห้องผ่าตัดเพื่อลดมลพิษ","เพิ่มความชื้นให้แก๊สที่ผู้ป่วยหายใจเข้า","กรองเชื้อโรคออกจากแก๊สที่หายใจออก","ดูดซับคาร์บอนไดออกไซด์ในวงจร"],ans:0,
+     exp:"<b>Scavenging system</b> รวบรวมแก๊สดมยาส่วนเกินจาก APL valve และ ventilator relief valve แล้วนำออกนอกห้องผ่าตัด เพื่อ<b>ลด waste anesthetic gas ที่บุคลากรสัมผัส</b> · ระบบมีทั้งแบบ active และ passive และต้องมีช่องระบายความดันกันแรงดันสะสมในวงจรผู้ป่วย"},
+    {stem:"ข้อใดถูกต้องเกี่ยวกับ closed scavenging system ที่ต้องมีเพื่อความปลอดภัยของผู้ป่วย",
+     opts:["ต้องมีวาล์วระบายทั้งความดันบวกและความดันลบ","ต้องต่อกับ oxygen analyzer โดยตรง","ต้องมี CO₂ absorbent ในตัว","ต้องใช้ความดันสูงกว่าวงจรผู้ป่วยเสมอ"],ans:0,
+     exp:"Closed scavenging interface <b>ต้องมี positive และ negative pressure relief valve</b> เพื่อป้องกันไม่ให้แรงดันในวงจรผู้ป่วยสูงเกิน (barotrauma) หรือถูกดูดจนติดลบ (ขัดขวางการหายใจออก) · เป็นจุดความปลอดภัยสำคัญของระบบ scavenging"}
+  ]
+},
+{
+  sec:"หมวด 8 · Preuse Check &amp; Pediatric Circuit",
+  note:"การตรวจเช็คก่อนใช้และข้อพิจารณาในผู้ป่วยเด็ก",
+  qs:[
+    {stem:"ขั้นตอนใดสำคัญที่สุดในการตรวจเช็คเครื่องดมยาก่อนใช้เพื่อป้องกัน hypoxia",
+     opts:["ตรวจสอบการทำงานของ oxygen analyzer และ hypoxic guard","ตรวจสอบระดับยาใน vaporizer","ตรวจสอบเสียงเตือนของเครื่อง","ตรวจสอบความสะอาดของ reservoir bag"],ans:0,
+     exp:"การตรวจ <b>oxygen analyzer (calibrate ที่ 21% และ 100%) และ hypoxic guard/proportioning system</b> เป็นด่านสำคัญที่สุดในการป้องกันการจ่าย hypoxic mixture · ร่วมกับการทำ leak test ของ low-pressure system และตรวจ backup O₂ cylinder"},
+    {stem:"เหตุใดจึงนิยมใช้ Mapleson F (Jackson-Rees) ในผู้ป่วยเด็กเล็ก",
+     opts:["เพราะมีความต้านทานต่ำและ dead space น้อย","เพราะสงวนความร้อนและความชื้นได้ดีที่สุด","เพราะประหยัดยาดมสลบมากที่สุด","เพราะมี CO₂ absorbent ในตัว"],ans:0,
+     exp:"Mapleson F (Ayre's T-piece ดัดแปลงโดย Jackson-Rees) มี<b>ความต้านทานต่ำและ dead space น้อย</b> ไม่มีลิ้นที่เด็กต้องออกแรงเปิด จึงเหมาะกับเด็กเล็กที่มีแรงหายใจน้อย · ข้อเสียคือสิ้นเปลือง FGF สูงและไม่สงวนความร้อน/ความชื้น"},
+    {stem:"ข้อใดถูกต้องเกี่ยวกับการช่วยหายใจในเด็กเล็กเมื่อเทียบกับผู้ใหญ่",
+     opts:["เด็กมี oxygen consumption ต่อน้ำหนักตัวสูงกว่าจึง desaturate เร็วกว่า","เด็กมี FRC ต่อน้ำหนักตัวสูงกว่าจึงทนต่อการหยุดหายใจได้นานกว่า","เด็กมีความต้านทานของทางเดินหายใจต่ำกว่าผู้ใหญ่มาก","เด็กมี compliance ของปอดสูงกว่าผู้ใหญ่มาก"],ans:0,
+     exp:"เด็กมี <b>oxygen consumption สูง (~6–8 ml/kg/min เทียบกับผู้ใหญ่ ~3 ml/kg/min)</b> ร่วมกับ FRC ต่อน้ำหนักตัวต่ำกว่า จึง<b>desaturate ระหว่าง apnea เร็วมาก</b> · ต้อง preoxygenate ให้ดีและทำหัตถการอย่างรวดเร็ว"},
+    {stem:"ในการทำ leak test ของ low-pressure system ก่อนใช้เครื่องดมยา ผลที่ยอมรับได้คือข้อใด",
+     opts:["ความดันในวงจรคงอยู่โดยไม่ลดลงอย่างมีนัยสำคัญ","ความดันในวงจรลดลงอย่างรวดเร็วภายในไม่กี่วินาที","reservoir bag แฟบทันทีที่ปล่อยมือ","มีเสียงลมรั่วจากข้อต่อได้เล็กน้อย"],ans:0,
+     exp:"การทำ leak test ที่ผ่านคือ<b>อัดแรงดันในวงจรแล้วความดันคงอยู่โดยไม่ลดลงอย่างมีนัยสำคัญ</b> · หากความดันลดเร็วหรือ bag แฟบแสดงว่ามีรอยรั่วในวงจร ต้องหาและแก้ไขก่อนใช้กับผู้ป่วยเพื่อป้องกัน hypoventilation และการจ่ายยาคลาดเคลื่อน"}
+  ]
+}
+];
+
+let answered=0, correct=0, totalQ=0;
+let autoSubmitted=false, leftReported=false;
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbylYFUwXHFjob1851FmezQHPk2hQD15q-TGK9O8B-v37us_JhLaT0_8-pK8AaeYfR_Gmw/exec";
+const QUIZ_NAME = "Ventilator Circuit ชุดใหม่ (40 ข้อ)";
+const KEYS=["ก","ข","ค","ง"];
+const quiz=document.getElementById("quiz");
+let counter=0;
+
+DATA.forEach((sec,si)=>{
+  const head=document.createElement("div");
+  head.className="section-head";
+  head.innerHTML=`<span class="no">0${si+1}</span><h2>${sec.sec}</h2>`;
+  quiz.appendChild(head);
+  const note=document.createElement("p");
+  note.className="section-note";note.textContent=sec.note;
+  quiz.appendChild(note);
+
+  sec.qs.forEach((q)=>{
+    counter++; totalQ++;
+    const n=counter;
+    // rotate options so answer key is evenly distributed across ก-ง
+    const shift=((ANSKEY[n-1]-q.ans)%4+4)%4;
+    if(shift){
+      const ro=new Array(4);
+      for(let i=0;i<4;i++) ro[(i+shift)%4]=q.opts[i];
+      q.opts=ro; q.ans=ANSKEY[n-1];
+    }
+    const card=document.createElement("div");
+    card.className="q";
+    const calcHtml=q.calc?`<div class="calc">${q.calc}</div>`:"";
+    card.innerHTML=`
+      <div class="q-top"><span class="qno">Q${n}</span><div class="stem">${q.stem}</div></div>
+      <ul class="opts" data-ans="${q.ans}"></ul>
+      <div class="explain"><span class="tag">เฉลย · คำอธิบาย</span><div class="etext"></div>${calcHtml}</div>`;
+    const ul=card.querySelector(".opts");
+    q.opts.forEach((o,oi)=>{
+      const li=document.createElement("li");
+      li.className="opt";
+      li.innerHTML=`<span class="k">${KEYS[oi]}.</span><span>${o}</span>`;
+      li.addEventListener("click",()=>choose(card,ul,oi,q));
+      ul.appendChild(li);
+    });
+    card.querySelector(".etext").innerHTML=q.exp;
+    quiz.appendChild(card);
+  });
+});
+document.getElementById("total").textContent=totalQ;
+
+function choose(card,ul,oi,q){
+  if(ul.dataset.done)return;
+  ul.dataset.done="1";
+  [...ul.children].forEach((li,i)=>{
+    li.classList.add("locked");
+    if(i===q.ans)li.classList.add("correct");
+    else if(i===oi)li.classList.add("wrong");
+    else li.classList.add("dim");
+  });
+  card.querySelector(".explain").classList.add("show");
+  answered++;
+  if(oi===q.ans)correct++;
+  updateScore();
+}
+function updateScore(){
+  document.getElementById("score").textContent=correct;
+  document.getElementById("answered").textContent=answered;
+  document.getElementById("fill").style.width=(answered/totalQ*100)+"%";
+  if(answered===totalQ && !autoSubmitted){
+    autoSubmitted=true;
+    submitScore();
+  }
+}
+function setStatus(msg,cls){
+  const el=document.getElementById("submitStatus");
+  if(!el) return;
+  el.textContent=msg; el.className="submitstatus"+(cls?(" "+cls):"");
+}
+function buildPayload(){
+  return {
+    name:(document.getElementById("takerName").value||"").trim(),
+    score:correct, total:totalQ, answered:answered,
+    set:QUIZ_NAME,
+    status: answered===totalQ ? "ครบ" : "ไม่ครบ"
+  };
+}
+function submitScore(retry){
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  const p=buildPayload();
+  setStatus("กำลังส่งคะแนน…");
+  fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(p)})
+  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓","ok"); })
+  .catch(()=>{
+    if(!retry){ setTimeout(()=>submitScore(true),1500); return; }
+    setStatus("ส่งคะแนนอัตโนมัติไม่สำเร็จ","err");
+  });
+}
+function reportAbandon(){
+  if(autoSubmitted || leftReported || answered===0) return;
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  leftReported=true;
+  const p=buildPayload();
+  try{ navigator.sendBeacon(SUBMIT_URL, JSON.stringify(p)); }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") reportAbandon(); });
+window.addEventListener("pagehide", reportAbandon);
+function resetQuiz(){
+  answered=0;correct=0;autoSubmitted=false;leftReported=false;
+  document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
+  document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));
+  setStatus("");
+  updateScore();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>

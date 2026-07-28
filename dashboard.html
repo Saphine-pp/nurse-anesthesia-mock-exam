@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard คะแนน — Mixed Mock Exam 100 ข้อ</title>
+<title>Dashboard คะแนน — คลังข้อสอบวิสัญญีพยาบาล</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,7 +28,17 @@
     padding:4px 10px;border-radius:99px;display:inline-block;margin-top:12px;}
   .hero a.back:hover{border-color:#fff;}
 
-  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 18px;flex-wrap:wrap;}
+  .quizpicker{margin:24px 0 0;}
+  .quizpicker .lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
+  .qchips{display:flex;flex-wrap:wrap;gap:7px;}
+  .qchip{font-family:"IBM Plex Sans Thai",sans-serif;font-size:13px;border:1px solid var(--line);background:#fff;
+    color:var(--ink);border-radius:99px;padding:7px 13px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .qchip:hover{border-color:var(--slate);}
+  .qchip.active{background:var(--slate);border-color:var(--slate);color:#fff;}
+  .qchip .n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;opacity:.75;}
+  .qchip.active .n{opacity:.9;}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 18px;flex-wrap:wrap;}
   .toolbar .status{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);}
   .toolbar .actions{display:flex;gap:8px;align-items:center;}
   input#search{font-family:"IBM Plex Sans Thai",sans-serif;font-size:13.5px;padding:7px 11px;
@@ -84,13 +94,18 @@
   <div class="hero-inner">
     <p class="eyebrow">Board Prep · Score Dashboard</p>
     <h1>สรุปคะแนนผู้เข้าสอบ</h1>
-    <p>Mixed Mock Exam 100 ข้อ — ข้อมูลดึงตรงจาก Google Sheet ผ่าน Apps Script</p>
-    <a class="back" href="mixed_mock_exam_100_tracked.html">← กลับไปหน้าข้อสอบ</a>
+    <p>คลังข้อสอบวิสัญญีพยาบาล — ข้อมูลดึงตรงจาก Google Sheet ผ่าน Apps Script แยกสรุปตามชุดข้อสอบ</p>
+    <a class="back" href="index.html">← กลับหน้ารวมข้อสอบ</a>
   </div>
 </header>
 
 <div class="wrap">
   <div id="cfgWarning"></div>
+
+  <div class="quizpicker">
+    <p class="lbl">เลือกชุดข้อสอบ</p>
+    <div class="qchips" id="quizChips"></div>
+  </div>
 
   <div class="toolbar">
     <span class="status" id="status">กำลังโหลด…</span>
@@ -108,9 +123,9 @@
     <div class="card warn"><p class="lbl">ไม่ครบ / ออกกลางคัน</p><p class="val" id="cIncomplete">–</p></div>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="topicPanel">
     <h3>ความแม่นยำเฉลี่ยรายหัวข้อ</h3>
-    <p class="sub">เฉลี่ยจากผู้เข้าสอบทั้งหมดที่ส่งคะแนนมาแล้ว</p>
+    <p class="sub">เฉลี่ยจากผู้เข้าสอบทั้งหมดที่ส่งคะแนนมาแล้ว (เฉพาะชุดที่มีการแยกหัวข้อ)</p>
     <div id="topicBreakdown"></div>
   </div>
 
@@ -121,8 +136,8 @@
       <table>
         <thead>
           <tr>
-            <th>#</th><th>ชื่อ</th><th>ชุด</th><th>สถานะ</th><th>คะแนน</th><th>%</th>
-            <th>Vent</th><th>Opioid</th><th>Volatile</th><th>Induction</th><th>NMB</th>
+            <th>#</th><th>ชื่อ</th><th>สถานะ</th><th>คะแนน</th><th>%</th>
+            <th class="topic-col">Vent</th><th class="topic-col">Opioid</th><th class="topic-col">Volatile</th><th class="topic-col">Induction</th><th class="topic-col">NMB</th>
             <th>เวลาส่ง</th>
           </tr>
         </thead>
@@ -147,6 +162,8 @@ const TOPICS={
 };
 
 let rows=[];
+let currentQuiz=null;
+const NO_SET_LABEL="(ไม่ระบุชุด)";
 
 function parseFrac(s){
   if(typeof s!=="string"||s.indexOf("/")<0) return {ok:0,n:0};
@@ -155,6 +172,8 @@ function parseFrac(s){
 }
 
 function isComplete(r){ return !r.status || r.status==="ครบ"; }
+function quizOf(r){ return r.set || NO_SET_LABEL; }
+function currentRows(){ return rows.filter(r=>quizOf(r)===currentQuiz); }
 
 function setStatus(msg){document.getElementById("status").textContent=msg;}
 
@@ -181,14 +200,40 @@ async function load(){
 }
 
 function renderAll(){
+  renderQuizPicker();
   renderCards();
   renderTopics();
   renderTable();
 }
 
+function renderQuizPicker(){
+  const counts={};
+  rows.forEach(r=>{
+    const k=quizOf(r);
+    counts[k]=(counts[k]||0)+1;
+  });
+  const names=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  if(!names.length){
+    document.getElementById("quizChips").innerHTML='<span style="color:var(--muted);font-size:13px;">ยังไม่มีข้อมูล</span>';
+    currentQuiz=null;
+    return;
+  }
+  if(!currentQuiz || !counts[currentQuiz]) currentQuiz=names[0];
+  const box=document.getElementById("quizChips");
+  box.innerHTML="";
+  names.forEach(name=>{
+    const chip=document.createElement("button");
+    chip.className="qchip"+(name===currentQuiz?" active":"");
+    chip.innerHTML=`${escapeHtml(name)} <span class="n">${counts[name]}</span>`;
+    chip.onclick=()=>{ currentQuiz=name; renderAll(); };
+    box.appendChild(chip);
+  });
+}
+
 function renderCards(){
-  const completed=rows.filter(isComplete);
-  const incomplete=rows.filter(r=>!isComplete(r));
+  const scoped=currentRows();
+  const completed=scoped.filter(isComplete);
+  const incomplete=scoped.filter(r=>!isComplete(r));
   document.getElementById("cIncomplete").textContent=incomplete.length;
   const n=completed.length;
   document.getElementById("cCount").textContent=n;
@@ -206,11 +251,15 @@ function renderCards(){
 }
 
 function renderTopics(){
+  const scoped=currentRows();
   const box=document.getElementById("topicBreakdown");
+  const panel=document.getElementById("topicPanel");
   box.innerHTML="";
+  let anyTopicData=false;
   Object.keys(TOPICS).forEach(k=>{
     let ok=0,n=0;
-    rows.forEach(r=>{const f=parseFrac(r[k]);ok+=f.ok;n+=f.n;});
+    scoped.forEach(r=>{const f=parseFrac(r[k]);ok+=f.ok;n+=f.n;});
+    if(n) anyTopicData=true;
     const pct=n?Math.round(ok/n*100):0;
     const tp=TOPICS[k];
     const row=document.createElement("div");
@@ -220,13 +269,14 @@ function renderTopics(){
       <span class="sc">${pct}% (${ok}/${n||0})</span>`;
     box.appendChild(row);
   });
+  panel.style.display = anyTopicData ? "" : "none";
 }
 
 function renderTable(){
   const q=(document.getElementById("search").value||"").trim().toLowerCase();
   const tbody=document.getElementById("tbody");
   tbody.innerHTML="";
-  const filtered=rows
+  const filtered=currentRows()
     .filter(r=>!q || String(r.name||"").toLowerCase().indexOf(q)>=0)
     .slice()
     .sort((a,b)=>{
@@ -236,7 +286,10 @@ function renderTable(){
     });
 
   document.getElementById("emptyMsg").style.display = filtered.length ? "none" : "block";
-  if(!filtered.length && rows.length) document.getElementById("emptyMsg").textContent="ไม่พบชื่อที่ค้นหา";
+  if(!filtered.length && currentRows().length) document.getElementById("emptyMsg").textContent="ไม่พบชื่อที่ค้นหา";
+
+  const showTopics = currentRows().some(r=>["vent","op","vol","ind","nmb"].some(k=>parseFrac(r[k]).n));
+  document.querySelectorAll(".topic-col").forEach(el=>el.style.display = showTopics ? "" : "none");
 
   let rank=0;
   filtered.forEach((r)=>{
@@ -256,14 +309,13 @@ function renderTable(){
     tr.innerHTML=`
       <td class="rank">${complete? rank : "–"}</td>
       <td class="name">${escapeHtml(r.name||"(ไม่ระบุ)")}</td>
-      <td>${escapeHtml(r.set||"–")}</td>
       <td>${statusBadge}</td>
       <td>${score}/${complete? total : answered}</td>
       <td class="pct ${pctClass}">${pct}%</td>
-      ${["vent","op","vol","ind","nmb"].map(k=>{
+      ${showTopics ? ["vent","op","vol","ind","nmb"].map(k=>{
         const f=parseFrac(r[k]);
-        return `<td><span class="badge" style="background:${TOPICS[k].color}">${f.ok}/${f.n}</span></td>`;
-      }).join("")}
+        return `<td class="topic-col"><span class="badge" style="background:${TOPICS[k].color}">${f.ok}/${f.n}</span></td>`;
+      }).join("") : ""}
       <td>${ts}</td>`;
     tbody.appendChild(tr);
   });

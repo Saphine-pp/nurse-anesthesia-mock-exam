@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข้อสอบ Opioid — ขั้นสูง (Set 2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F0EEF4;--panel:#FFFFFF;--ink:#231C31;--muted:#645A73;--line:#DAD3E4;
+    --plum:#6C3FA6;--plum-soft:#ECE3F5;--signal:#1F9D63;--signal-soft:#E4F4EC;
+    --alert:#C4463A;--alert-soft:#F8E7E5;--ink-panel:#1A1327;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px;}
+
+  header.hero{background:var(--ink-panel);color:#F0EAF7;padding:26px 18px 22px;position:relative;overflow:hidden;}
+  .hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#B98FE0;margin:0 0 8px;}
+  .hero h1{font-size:26px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .hero p{margin:0;color:#B3A6C6;font-size:14px;}
+  .badge-hard{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    background:#33244A;color:#C9A9EC;border:1px solid #59437F;border-radius:6px;padding:3px 8px;margin-left:8px;vertical-align:middle;}
+  .curve{position:absolute;left:0;right:0;bottom:0;height:52px;width:100%;z-index:1;opacity:.55;}
+
+  .scorebar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 18px;}
+  .scorebar .inner{max-width:820px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .readout{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);}
+  .readout b{color:var(--plum);font-weight:600;}
+  .bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden;max-width:280px;}
+  .bar span{display:block;height:100%;width:0;background:var(--plum);transition:width .4s ease;}
+  .reset{font-family:"IBM Plex Mono",monospace;font-size:12px;background:none;border:1px solid var(--line);
+    color:var(--muted);padding:5px 10px;border-radius:7px;cursor:pointer;}
+  .reset:hover{border-color:var(--plum);color:var(--plum);}
+
+  .section-head{display:flex;align-items:baseline;gap:12px;margin:38px 0 6px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  .section-head .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--plum);font-weight:600;}
+  .section-head h2{font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .section-note{font-size:13px;color:var(--muted);margin:6px 0 16px;}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;margin:0 0 14px;}
+  .q-top{display:flex;gap:11px;align-items:flex-start;}
+  .qno{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;background:var(--plum-soft);color:var(--plum);
+    padding:3px 8px;border-radius:6px;flex:none;margin-top:2px;}
+  .stem{font-size:15.5px;font-weight:500;}
+  .opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px;}
+  .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+    cursor:pointer;font-size:14.5px;background:#fff;transition:border-color .15s,background .15s;}
+  .opt:hover{border-color:var(--plum);background:#FCFAFE;}
+  .opt .k{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--muted);flex:none;}
+  .opt.correct{background:var(--signal-soft);border-color:var(--signal);}
+  .opt.correct .k{color:var(--signal);}
+  .opt.wrong{background:var(--alert-soft);border-color:var(--alert);}
+  .opt.wrong .k{color:var(--alert);}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:.55;}
+
+  .explain{margin-top:12px;border-left:3px solid var(--plum);background:#FAF7FD;border-radius:0 8px 8px 0;
+    padding:11px 13px;font-size:14px;color:#33294A;display:none;}
+  .explain.show{display:block;}
+  .explain .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--plum);display:block;margin-bottom:4px;}
+  .explain b{color:var(--ink);}
+
+  footer{margin-top:44px;text-align:center;color:var(--muted);font-size:12.5px;}
+  footer .mono{font-size:11px;letter-spacing:.1em;}
+
+  .namecard{margin:16px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .namecard label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 8px;}
+  .namecard input{width:100%;font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);}
+  .namecard input:focus{outline:none;border-color:var(--ink);}
+  .submitstatus{margin-top:10px;font-size:13px;min-height:18px;text-align:center;}
+  .submitstatus.ok{color:var(--signal);}
+  .submitstatus.err{color:var(--alert);}
+
+  @media print{
+    .scorebar,.reset,.curve,.namecard,.submitstatus{display:none!important;}
+    body{background:#fff;}
+    header.hero{background:#fff;color:#000;border-bottom:2px solid #000;}
+    .eyebrow{color:#000;}.hero p{color:#333;}.badge-hard{color:#000;border-color:#000;background:#eee;}
+    .explain{display:block!important;}
+    .opt.correct{outline:2px solid var(--signal);}
+    .q{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Board Prep · Opioid Set 2</p>
+    <h1>ข้อสอบ Opioid — ขั้นสูง<span class="badge-hard">ADVANCED</span></h1>
+    <p>18 ข้อ · ตัวเลือกสมมาตร ไม่ใบ้คำตอบ · แตะเพื่อดูเฉลยและคำอธิบาย</p>
+  </div>
+  <svg class="curve" viewBox="0 0 820 52" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,50 C60,50 90,8 140,8 C210,8 240,46 340,48 C440,50 470,30 560,26 C660,22 700,40 820,42"
+      fill="none" stroke="#B98FE0" stroke-width="2"/>
+  </svg>
+</header>
+
+<div class="wrap">
+  <div class="namecard">
+    <label for="takerName">ชื่อ–นามสกุล ของผู้ทำ (ไม่บังคับ)</label>
+    <input id="takerName" type="text" placeholder="กรอกชื่อก่อนเริ่มทำข้อสอบ หากอยากให้ปรากฏใน Dashboard" maxlength="60" autocomplete="name">
+  </div>
+</div>
+
+<div class="scorebar">
+  <div class="inner">
+    <span class="readout">SCORE <b id="score">0</b>/<span id="answered">0</span> · <span id="total">18</span> ข้อ</span>
+    <div class="bar"><span id="fill"></span></div>
+    <button class="reset" onclick="resetQuiz()">รีเซ็ต</button>
+  </div>
+</div>
+
+<main class="wrap" id="quiz"></main>
+<div class="wrap"><div id="submitStatus" class="submitstatus"></div></div>
+
+<footer class="wrap">
+  <p>ข้อสอบต้นฉบับระดับขั้นสูง เรียบเรียงแนวจากคลังข้อสอบเก่าในโปรเจกต์ — ใช้เพื่อฝึกทบทวนเท่านั้น</p>
+  <p class="mono">OPIOID · ADVANCED SET · v1</p>
+</footer>
+
+<script>
+const DATA = [
+{
+  sec:"หมวด 1 · Receptor &amp; กลไกออกฤทธิ์",
+  note:"แยกกลไกและคุณสมบัติเฉพาะของ opioid แต่ละชนิด",
+  qs:[
+    {
+      stem:"opioid ชนิดใดต่อไปนี้ทำให้เกิดการหลั่ง histamine น้อยที่สุด",
+      opts:["Morphine","Codeine","Meperidine","Fentanyl"],
+      ans:3,
+      exp:"<b>Fentanyl</b> (และ remifentanil, sufentanil) แทบไม่กระตุ้นการหลั่ง histamine จึงเหมาะกับผู้ป่วยที่ไวต่อ histamine หรือหอบหืด ส่วน morphine, meperidine และ codeine กระตุ้น histamine release ทำให้เกิดคัน ผื่นแดง หลอดลมหดเกร็ง และความดันต่ำได้"
+    },
+    {
+      stem:"Tramadol ออกฤทธิ์ระงับปวดผ่านกลไกใด",
+      opts:["Kappa agonist ร่วมกับยับยั้ง COX","Mu agonist ร่วมกับยับยั้ง reuptake ของ serotonin และ norepinephrine","Partial mu agonist ร่วมกับกระตุ้น GABA","Mu antagonist ร่วมกับกระตุ้น NMDA"],
+      ans:1,
+      exp:"Tramadol เป็น <b>weak mu-agonist ร่วมกับการยับยั้ง reuptake ของ serotonin และ norepinephrine</b> จึงระงับปวดแบบผสม ผลข้างเคียงที่ต้องระวังคือ <b>ชัก</b> (ลด seizure threshold) และ <b>serotonin syndrome</b> เมื่อใช้ร่วมกับยากลุ่ม serotonergic (SSRI/SNRI/MAOI)"
+    },
+    {
+      stem:"opioid ชนิดใดมีฤทธิ์เป็น NMDA-receptor antagonist ร่วมด้วย",
+      opts:["Morphine","Oxycodone","Methadone","Hydromorphone"],
+      ans:2,
+      exp:"<b>Methadone</b> เป็น mu-agonist ที่มีฤทธิ์ <b>NMDA-receptor antagonist</b> ร่วม จึงมีบทบาทในปวดเรื้อรัง ปวดแบบ neuropathic และผู้ป่วยที่ดื้อ opioid ข้อควรระวังคือ half-life ยาวและไม่แน่นอน และเสี่ยง <b>QT prolongation</b>"
+    },
+    {
+      stem:"อาการใดของ opioid ที่แทบไม่เกิดการดื้อยา (tolerance) แม้ใช้ต่อเนื่องนาน",
+      opts:["การกดการหายใจ","อาการง่วงซึม","อาการคลื่นไส้","อาการท้องผูก"],
+      ans:3,
+      exp:"ผู้ป่วยเกิด tolerance ต่อการกดหายใจ ง่วงซึม คลื่นไส้ และฤทธิ์ระงับปวดเมื่อใช้ opioid นาน แต่ <b>แทบไม่เกิด tolerance ต่ออาการท้องผูกและรูม่านตาหด (miosis)</b> จึงต้องให้ยาระบายควบคู่ในผู้ป่วยที่ใช้ opioid ระยะยาว"
+    }
+  ]
+},
+{
+  sec:"หมวด 2 · Neuraxial Opioid &amp; PCA",
+  note:"คุณสมบัติตามความชอบไขมันและการตั้งค่าเครื่อง",
+  qs:[
+    {
+      stem:"ข้อใดถูกต้องเมื่อเปรียบเทียบ neuraxial morphine กับ neuraxial fentanyl",
+      opts:["Fentanyl กระจายตัว rostral มากกว่าเพราะเป็น hydrophilic","Morphine ออกฤทธิ์เร็วกว่าและ duration สั้นกว่า fentanyl","Morphine กระจายตัว rostral มากกว่าและเสี่ยง delayed respiratory depression","Fentanyl มี duration ยาวกว่าและกดหายใจแบบล่าช้ากว่า morphine"],
+      ans:2,
+      exp:"Morphine เป็น <b>hydrophilic</b> จึงอยู่ใน CSF นาน กระจายขึ้นสูง (rostral spread) → ออกฤทธิ์ช้า, duration ยาว และเสี่ยง <b>delayed respiratory depression (6–24 ชม.)</b> ส่วน fentanyl เป็น lipophilic ออกฤทธิ์เร็ว duration สั้น และกดหายใจแบบ early มากกว่า"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับการตั้งค่า PCA / PCEA",
+      opts:["การตั้ง basal infusion ใน IV-PCA เพิ่มความปลอดภัยในผู้ป่วยทั่วไป","Lock-out interval ควรตั้งให้สั้นกว่า peak onset ของยา","Lock-out interval สัมพันธ์กับ peak onset ของยาและเป็นกลไกความปลอดภัยหลัก","PCEA จำเป็นต้องตั้ง basal rate เสมอในผู้ป่วยทุกราย"],
+      ans:2,
+      exp:"<b>Lock-out interval</b> ตั้งให้สอดคล้องกับ peak onset ของยาแต่ละชนิด เพื่อไม่ให้ผู้ป่วยกดยาซ้ำก่อนยาออกฤทธิ์เต็มที่ จึงเป็นกลไกความปลอดภัยหลักของ PCA ส่วน <b>basal infusion ใน IV-PCA ไม่เพิ่มความปลอดภัย</b> (เพิ่มความเสี่ยงกดหายใจ) และ PCEA ไม่จำเป็นต้องมี basal เสมอ"
+    },
+    {
+      stem:"Fentanyl 100 mcg IV มีฤทธิ์ระงับปวดเทียบเท่ากับ morphine ทางหลอดเลือดดำประมาณกี่มิลลิกรัม",
+      opts:["1 mg","5 mg","10 mg","50 mg"],
+      ans:2,
+      exp:"อัตราส่วน equianalgesic โดยประมาณคือ fentanyl : morphine ≈ 100 mcg : 10 mg (fentanyl แรงกว่า morphine ~100 เท่า) ดังนั้น fentanyl 100 mcg ≈ <b>morphine 10 mg IV</b> — ใช้เป็นหลักคร่าว ๆ ในการปรับเปลี่ยนชนิดยา ควรลด dose ลงเผื่อ incomplete cross-tolerance"
+    }
+  ]
+},
+{
+  sec:"หมวด 3 · ผลข้างเคียง &amp; อันตรกิริยา",
+  note:"ภาวะแทรกซ้อนจำเพาะและยาที่ต้องระวังเมื่อใช้ร่วม",
+  qs:[
+    {
+      stem:"หญิง 45 ปี biliary colic ได้ opioid แล้วปวดมากขึ้น เกิดจากกลไกใด",
+      opts:["Histamine release","Sphincter of Oddi spasm","การเพิ่ม bile flow","Mesenteric vasoconstriction"],
+      ans:1,
+      exp:"Opioid ทำให้เกิด <b>Sphincter of Oddi spasm</b> เพิ่มความดันในท่อน้ำดี จึงอาจทำให้ปวด biliary colic แย่ลง กรณีนี้อาจเลือกใช้ opioid ที่กระตุ้นน้อยกว่า หรือใช้ยาแก้ปวดกลุ่มอื่นร่วม และให้ยาคลายเกร็งเมื่อจำเป็น"
+    },
+    {
+      stem:"Meperidine (Pethidine) เมื่อใช้ร่วมกับยากลุ่มใดเสี่ยงเกิด serotonin syndrome รุนแรง",
+      opts:["Beta-blocker","Loop diuretic","MAOI","Calcium channel blocker"],
+      ans:2,
+      exp:"Meperidine มีฤทธิ์ serotonergic เมื่อใช้ร่วมกับ <b>MAOI</b> (หรือ SSRI/SNRI) เสี่ยง <b>serotonin syndrome</b> (ไข้สูง เกร็ง กระตุก สับสน ความดันแกว่ง) ที่อาจถึงแก่ชีวิต จึงเป็นข้อห้ามสำคัญของ meperidine"
+    },
+    {
+      stem:"opioid ชนิดใดนิยมใช้ระงับ postoperative shivering ผ่าน kappa receptor",
+      opts:["Meperidine","Morphine","Fentanyl","Remifentanil"],
+      ans:0,
+      exp:"<b>Meperidine</b> มีฤทธิ์ต่อ kappa receptor เด่น จึงลด postoperative shivering ได้ดี (ขนาดต่ำ ~12.5–25 mg IV) แต่ต้องระวัง normeperidine สะสมในไตวายและอันตรกิริยากับ MAOI"
+    }
+  ]
+},
+{
+  sec:"หมวด 4 · Prodrug &amp; Pharmacogenetics",
+  note:"การเปลี่ยนรูปยาและความแปรผันทางพันธุกรรม",
+  qs:[
+    {
+      stem:"Codeine ให้ผลระงับปวดโดยต้องอาศัยกระบวนการใด",
+      opts:["เปลี่ยนเป็น morphine ผ่านเอนไซม์ CYP2D6","จับ mu receptor โดยตรงไม่ต้องเปลี่ยนแปลง","ยับยั้ง COX ที่เนื้อเยื่อส่วนปลาย","เปลี่ยนเป็น normeperidine ผ่านตับ"],
+      ans:0,
+      exp:"Codeine เป็น <b>prodrug</b> ต้องถูกเปลี่ยนเป็น morphine ผ่านเอนไซม์ <b>CYP2D6</b> จึงจะออกฤทธิ์ ผู้ที่มี CYP2D6 ทำงานน้อย (poor metabolizer) จะได้ผลระงับปวดน้อย ขณะที่ ultrarapid metabolizer เสี่ยงได้ morphine สูงเกิน"
+    },
+    {
+      stem:"ผู้ป่วยที่เป็น ultrarapid metabolizer ของ CYP2D6 เมื่อได้ codeine เสี่ยงต่อภาวะใด",
+      opts:["ไม่ได้ผลระงับปวดเลย","ได้รับ morphine เกินขนาด","เกิด methemoglobinemia","ชักจาก metabolite"],
+      ans:1,
+      exp:"Ultrarapid metabolizer เปลี่ยน codeine เป็น morphine ได้เร็วและมากผิดปกติ → <b>morphine ในเลือดสูงจนเกิดภาวะเกินขนาด</b> (กดหายใจ ซึม) โดยเฉพาะอันตรายในเด็กและมารดาให้นมบุตร จึงหลีกเลี่ยง codeine ในกลุ่มเสี่ยง"
+    }
+  ]
+},
+{
+  sec:"หมวด 5 · เภสัชวิทยาประยุกต์ &amp; ความปลอดภัย",
+  note:"คุณสมบัติเด่นของยาแต่ละตัวและการจัดการทางคลินิก",
+  qs:[
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับ Remifentanil",
+      opts:["ถูกสลายด้วย plasma esterase จึงต้องปรับขนาดในผู้ป่วยไตวาย","CSHT เพิ่มขึ้นตามระยะเวลา infusion อย่างชัดเจน","เสี่ยงเกิด acute tolerance และ hyperalgesia หลังหยุดยา","มี metabolite ที่ออกฤทธิ์และสะสมในตับ"],
+      ans:2,
+      exp:"Remifentanil สลายด้วย nonspecific esterase (organ-independent, ไม่ต้องปรับในไต/ตับวาย) มี CSHT สั้นและ<b>คงที่</b> แม้ให้ยานาน แต่จุดที่ต้องระวังคือ <b>acute opioid tolerance และ hyperalgesia</b> หลังหยุดยา จึงต้องวางแผน long-acting analgesia ล่วงหน้า"
+    },
+    {
+      stem:"Buprenorphine มีคุณสมบัติทางเภสัชวิทยาข้อใด",
+      opts:["เป็น partial mu-agonist ที่มี ceiling effect ต่อการกดหายใจ","เป็น full mu-agonist ที่ไม่มี ceiling effect","เป็น pure antagonist ที่ใช้แก้พิษ opioid","เป็น kappa-agonist ที่ใช้ระงับ shivering"],
+      ans:0,
+      exp:"<b>Buprenorphine</b> เป็น <b>partial mu-agonist</b> ที่จับ receptor แน่น (high affinity) และมี <b>ceiling effect</b> ต่อการกดหายใจ จึงใช้ในการรักษาการติด opioid ข้อควรระวังคือมันแทนที่ full agonist บน receptor ได้ อาจกระตุ้น withdrawal และดื้อต่อการกลับฤทธิ์ด้วย naloxone มาตรฐาน"
+    },
+    {
+      stem:"การฉีด fentanyl ขนาดสูงอย่างรวดเร็วขณะ induction อาจทำให้เกิดภาวะเฉียบพลันใด",
+      opts:["Malignant hyperthermia","Chest wall rigidity","Coronary steal","Histamine flush"],
+      ans:1,
+      exp:"Fentanyl ขนาดสูงฉีดเร็วอาจทำให้เกิด <b>chest wall (truncal) rigidity</b> จนช่วยหายใจด้วย bag-mask ได้ยาก แก้ไขด้วยการให้ยาหย่อนกล้ามเนื้อและ/หรือ naloxone จึงควรฉีดช้า ๆ และเตรียมพร้อมควบคุมทางเดินหายใจ"
+    },
+    {
+      stem:"Methadone เป็น opioid ที่ต้องเฝ้าระวังความผิดปกติของ ECG เรื่องใด",
+      opts:["QT prolongation","PR shortening","Delta wave","Peaked T wave"],
+      ans:0,
+      exp:"<b>Methadone ทำให้ QT prolongation</b> และเสี่ยง torsades de pointes โดยเฉพาะขนาดสูงหรือใช้ร่วมกับยาที่ยืด QT อื่น จึงควรตรวจ ECG ก่อนและระหว่างการปรับขนาด"
+    },
+    {
+      stem:"ข้อใดถูกต้องเกี่ยวกับ naloxone",
+      opts:["ออกฤทธิ์สั้นกว่า morphine จึงเสี่ยง re-narcotization","ออกฤทธิ์นานกว่า opioid ทุกชนิด","เป็น partial agonist ที่ไม่กระตุ้น withdrawal","ใช้แก้ฤทธิ์ benzodiazepine ได้"],
+      ans:0,
+      exp:"<b>Naloxone ออกฤทธิ์สั้น (~30–60 นาที)</b> มักสั้นกว่าฤทธิ์ของ opioid หลายชนิด ผู้ป่วยจึงอาจกลับมากดหายใจซ้ำ (re-narcotization) ต้องเฝ้าระวัง/ให้ซ้ำหรือ infusion เป็น pure antagonist ที่กระตุ้น withdrawal ได้ และไม่ใช้แก้ benzodiazepine (ต้องใช้ flumazenil)"
+    },
+    {
+      stem:"ผู้ป่วยหญิง 45 kg ได้ IV-PCA morphine (PCA dose 1 mg, lock-out 5 นาที, 1-hr limit 20 mg) หลังใช้ 40 นาทีเริ่มซึม RR 8 หลังจัดการภาวะเฉียบพลันแล้ว ควรปรับเครื่องอย่างไร",
+      opts:["เพิ่ม PCA dose เป็น 2 mg เพื่อคุมปวด","ลด 1-hr limit และพิจารณายืด lock-out interval","เพิ่ม basal infusion เพื่อความสม่ำเสมอ","ลด lock-out interval เหลือ 2 นาที"],
+      ans:1,
+      exp:"ค่า 1-hr limit 20 mg สูงเกินไปสำหรับผู้ป่วย 45 kg และผู้ป่วยเริ่มกดหายใจ จึงควร <b>ลด 1-hr limit และยืด lock-out interval</b> เพื่อเพิ่มความปลอดภัย ส่วนการเพิ่ม dose, เพิ่ม basal หรือลด lock-out ล้วนเพิ่มความเสี่ยงกดหายใจซ้ำ"
+    }
+  ]
+}
+];
+
+let answered=0, correct=0, totalQ=0;
+let autoSubmitted=false, leftReported=false;
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbylYFUwXHFjob1851FmezQHPk2hQD15q-TGK9O8B-v37us_JhLaT0_8-pK8AaeYfR_Gmw/exec";
+const QUIZ_NAME = "Opioid ขั้นสูง (18 ข้อ)";
+const KEYS=["ก","ข","ค","ง"];
+const quiz=document.getElementById("quiz");
+
+DATA.forEach((sec,si)=>{
+  const head=document.createElement("div");
+  head.className="section-head";
+  head.innerHTML=`<span class="no">0${si+1}</span><h2>${sec.sec}</h2>`;
+  quiz.appendChild(head);
+  const note=document.createElement("p");
+  note.className="section-note";note.textContent=sec.note;
+  quiz.appendChild(note);
+
+  sec.qs.forEach((q)=>{
+    totalQ++;
+    const n=totalQ;
+    const card=document.createElement("div");
+    card.className="q";
+    card.innerHTML=`
+      <div class="q-top"><span class="qno">Q${n}</span><div class="stem">${q.stem}</div></div>
+      <ul class="opts" data-ans="${q.ans}"></ul>
+      <div class="explain"><span class="tag">เฉลย · คำอธิบาย</span><div class="etext"></div></div>`;
+    const ul=card.querySelector(".opts");
+    q.opts.forEach((o,oi)=>{
+      const li=document.createElement("li");
+      li.className="opt";
+      li.innerHTML=`<span class="k">${KEYS[oi]}.</span><span>${o}</span>`;
+      li.addEventListener("click",()=>choose(card,ul,oi,q));
+      ul.appendChild(li);
+    });
+    card.querySelector(".etext").innerHTML=q.exp;
+    quiz.appendChild(card);
+  });
+});
+document.getElementById("total").textContent=totalQ;
+
+function choose(card,ul,oi,q){
+  if(ul.dataset.done)return;
+  ul.dataset.done="1";
+  [...ul.children].forEach((li,i)=>{
+    li.classList.add("locked");
+    if(i===q.ans)li.classList.add("correct");
+    else if(i===oi)li.classList.add("wrong");
+    else li.classList.add("dim");
+  });
+  card.querySelector(".explain").classList.add("show");
+  answered++;
+  if(oi===q.ans)correct++;
+  updateScore();
+}
+function updateScore(){
+  document.getElementById("score").textContent=correct;
+  document.getElementById("answered").textContent=answered;
+  document.getElementById("fill").style.width=(answered/totalQ*100)+"%";
+  if(answered===totalQ && !autoSubmitted){
+    autoSubmitted=true;
+    submitScore();
+  }
+}
+function setStatus(msg,cls){
+  const el=document.getElementById("submitStatus");
+  if(!el) return;
+  el.textContent=msg; el.className="submitstatus"+(cls?(" "+cls):"");
+}
+function buildPayload(){
+  return {
+    name:(document.getElementById("takerName").value||"").trim(),
+    score:correct, total:totalQ, answered:answered,
+    set:QUIZ_NAME,
+    status: answered===totalQ ? "ครบ" : "ไม่ครบ"
+  };
+}
+function submitScore(retry){
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  const p=buildPayload();
+  setStatus("กำลังส่งคะแนน…");
+  fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(p)})
+  .then(()=>{ setStatus("ส่งคะแนนเรียบร้อยแล้ว ✓","ok"); })
+  .catch(()=>{
+    if(!retry){ setTimeout(()=>submitScore(true),1500); return; }
+    setStatus("ส่งคะแนนอัตโนมัติไม่สำเร็จ","err");
+  });
+}
+function reportAbandon(){
+  if(autoSubmitted || leftReported || answered===0) return;
+  if(!SUBMIT_URL || SUBMIT_URL.indexOf("PASTE_")===0) return;
+  leftReported=true;
+  const p=buildPayload();
+  try{ navigator.sendBeacon(SUBMIT_URL, JSON.stringify(p)); }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") reportAbandon(); });
+window.addEventListener("pagehide", reportAbandon);
+function resetQuiz(){
+  answered=0;correct=0;autoSubmitted=false;leftReported=false;
+  document.querySelectorAll(".opts").forEach(ul=>{delete ul.dataset.done;[...ul.children].forEach(li=>li.className="opt");});
+  document.querySelectorAll(".explain").forEach(e=>e.classList.remove("show"));
+  setStatus("");
+  updateScore();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>
