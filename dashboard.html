@@ -93,8 +93,8 @@
 <header class="hero">
   <div class="hero-inner">
     <p class="eyebrow">Board Prep · Score Dashboard</p>
-    <h1>สรุปคะแนนผู้เข้าสอบ</h1>
-    <p>คลังข้อสอบวิสัญญีพยาบาล — ข้อมูลดึงตรงจาก Google Sheet ผ่าน Apps Script แยกสรุปตามชุดข้อสอบ</p>
+    <h1>สรุปผลการทำข้อสอบ</h1>
+    <p>คลังข้อสอบวิสัญญีพยาบาล — บันทึกคะแนนแบบไม่ระบุชื่อ แยกสรุปตามชุดข้อสอบ</p>
     <a class="back" href="index.html">← กลับหน้ารวมข้อสอบ</a>
   </div>
 </header>
@@ -110,7 +110,7 @@
   <div class="toolbar">
     <span class="status" id="status">กำลังโหลด…</span>
     <div class="actions">
-      <input id="search" type="text" placeholder="ค้นหาชื่อ…" oninput="renderTable()">
+      <input id="search" type="hidden" value="">
       <button class="btn ghost" onclick="load()">รีเฟรช</button>
     </div>
   </div>
@@ -130,13 +130,13 @@
   </div>
 
   <div class="panel">
-    <h3>รายชื่อผู้เข้าสอบ</h3>
-    <p class="sub">เรียงตามคะแนนรวมจากมากไปน้อย</p>
+    <h3>รายการผลการทำข้อสอบ</h3>
+    <p class="sub">บันทึกแบบไม่ระบุชื่อ · เรียงตามคะแนนรวมจากมากไปน้อย</p>
     <div class="tablewrap">
       <table>
         <thead>
           <tr>
-            <th>#</th><th>ชื่อ</th><th>สถานะ</th><th>คะแนน</th><th>%</th>
+            <th>#</th><th>ผู้ทำ</th><th>สถานะ</th><th>คะแนน</th><th>%</th>
             <th class="topic-col">Vent</th><th class="topic-col">Opioid</th><th class="topic-col">Volatile</th><th class="topic-col">Induction</th><th class="topic-col">NMB</th>
             <th>เวลาส่ง</th>
           </tr>
@@ -151,7 +151,7 @@
 <footer>Dashboard สรุปคะแนน · ข้อมูลอัปเดตเมื่อกดรีเฟรชหรือโหลดหน้าใหม่</footer>
 
 <script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbylYFUwXHFjob1851FmezQHPk2hQD15q-TGK9O8B-v37us_JhLaT0_8-pK8AaeYfR_Gmw/exec";
+const DATA_URL = "https://script.google.com/macros/s/AKfycbyxjS3qR58huJqWwbMRpiiTSFuLD40JKzTNV0JdwQS99D_tuw9OmWbaihlfOvjCAIU/exec";
 
 const TOPICS={
   vent:{label:"VENT",color:"#0E7C7B",name:"Ventilator circuit"},
@@ -326,6 +326,7 @@ function escapeHtml(s){
 }
 
 load();
+setInterval(load,30000);
 </script>
 </body>
 </html>
